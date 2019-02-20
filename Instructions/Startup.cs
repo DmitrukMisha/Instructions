@@ -13,6 +13,8 @@ using Instructions.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Instructions.Models;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using UserClasses;
 
 namespace Instructions
 {
@@ -41,7 +43,15 @@ namespace Instructions
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<User>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-
+            services.AddTransient<IEmailSender, EmailSender>(i =>
+               new EmailSender(
+                   Configuration["EmailSender:Host"],
+                   Configuration.GetValue<int>("EmailSender:Port"),
+                   Configuration.GetValue<bool>("EmailSender:EnableSSL"),
+                   Configuration["EmailSender:UserName"],
+                   Configuration["EmailSender:Password"]
+               )
+           );
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
       //
