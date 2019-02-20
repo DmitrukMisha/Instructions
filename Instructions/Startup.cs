@@ -18,15 +18,13 @@ namespace Instructions
 
  
     public class Startup
-    {
-        int mishagovno;
+    {       
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
-        //misha huy sosi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
