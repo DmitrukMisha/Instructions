@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Instructions.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190220104513_migration")]
-    partial class migration
+    [Migration("20190220152330_Status")]
+    partial class Status
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -59,6 +59,8 @@ namespace Instructions.Data.Migrations
                     b.Property<bool>("RoleISAdmin");
 
                     b.Property<string>("SecurityStamp");
+
+                    b.Property<bool>("Status");
 
                     b.Property<bool>("TwoFactorEnabled");
 

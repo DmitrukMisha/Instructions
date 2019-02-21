@@ -22,7 +22,7 @@ namespace Instructions.Areas.Identity.Pages.Account.Manage
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             IEmailSender emailSender)
-        {   
+        {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
@@ -52,6 +52,7 @@ namespace Instructions.Areas.Identity.Pages.Account.Manage
         public async Task<IActionResult> OnGetAsync()
         {
             var user = await _userManager.GetUserAsync(User);
+            TempData["IsAdmin"] = user.RoleISAdmin;
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
@@ -68,8 +69,9 @@ namespace Instructions.Areas.Identity.Pages.Account.Manage
                 Email = email,
                 PhoneNumber = phoneNumber
             };
-            
+
             IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+
             return Page();
         }
 
@@ -81,6 +83,7 @@ namespace Instructions.Areas.Identity.Pages.Account.Manage
             }
 
             var user = await _userManager.GetUserAsync(User);
+            TempData["IsAdmin"] = user.RoleISAdmin;
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");

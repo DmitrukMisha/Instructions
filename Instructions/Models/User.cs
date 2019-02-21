@@ -11,5 +11,6 @@ namespace Instructions.Models
         public string Language { get; set; }
         public bool Color { get; set; }
         public bool RoleISAdmin { get; set; }
+        public bool Status { get; set; }
     }
 }

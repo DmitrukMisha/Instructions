@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Instructions.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Instructions.Areas.Identity.Pages.Account.Manage
 {
+
     public static class ManageNavPages
     {
+       
+
         public static string Index => "Index";
 
         public static string ChangePassword => "ChangePassword";
@@ -18,9 +23,9 @@ namespace Instructions.Areas.Identity.Pages.Account.Manage
 
         public static string ExternalLogins => "ExternalLogins";
 
-        public static string PersonalData => "PersonalData";
+        public static string PersonalInstructions => "PersonalInstructions";
 
-        public static string TwoFactorAuthentication => "TwoFactorAuthentication";
+        public static string AdminMenu => "AdminMenu";
 
         public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
 
@@ -32,10 +37,10 @@ namespace Instructions.Areas.Identity.Pages.Account.Manage
 
         public static string ExternalLoginsNavClass(ViewContext viewContext) => PageNavClass(viewContext, ExternalLogins);
 
-        public static string PersonalDataNavClass(ViewContext viewContext) => PageNavClass(viewContext, PersonalData);
+        public static string PersonalInstructionsNavClass(ViewContext viewContext) => PageNavClass(viewContext, PersonalInstructions);
 
-        public static string TwoFactorAuthenticationNavClass(ViewContext viewContext) => PageNavClass(viewContext, TwoFactorAuthentication);
-    
+        public static string AdminMenuNavClass(ViewContext viewContext) => PageNavClass(viewContext, AdminMenu);
+
         public static string PageNavClass(ViewContext viewContext, string page)
         {
             var activePage = viewContext.ViewData["ActivePage"] as string

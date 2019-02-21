@@ -5,6 +5,7 @@
 }
 
 <h4>@ViewData["Title"]</h4>
+
 @Html.Partial("_StatusMessage", Model.StatusMessage)
 <div class="row">
     <div class="col-md-6">
@@ -14,6 +15,7 @@
                 <label asp-for="Username"></label>
                 <input asp-for="Username" class="form-control" disabled />
             </div>
+            <p>KO!</p>
             <div class="form-group">
                 <label asp-for="Input.Email"></label>
                 @if (Model.IsEmailConfirmed)
