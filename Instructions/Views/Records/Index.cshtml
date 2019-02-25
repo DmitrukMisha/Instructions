@@ -1,0 +1,97 @@
+﻿@using Instructions.Models
+
+@model Instructions.Models.Record
+
+@{
+    ViewBag.Title = "Record creating";
+}
+<form asp-action="create" asp-controller="records">
+    <div class="form-group">
+        <label asp-for="Name" class="control-label">Name</label>
+        <input required type="text" asp-for="Name" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Description" class="control-label">Description</label>
+        <input required type="text" asp-for="Description" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ThemeName" class="control-label">Theme name</label>
+        <select asp-for="ThemeName" class="form-control">
+            @foreach (Theme theme in ViewBag.Themes)
+            {
+                <option>@theme.Themes</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label">Tags</label>
+        <input id="tag" type="text" class="form-control" name="Tags" />
+    </div>
+    <center>
+        <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-default" />
+        </div>
+    </center>
+    <div id="fileBasket" class="filebasket">
+        Drag-n-Drop files here.
+    </div>
+    <br />
+    <div id="Steps"></div>
+</form>
+
+<center>
+    <input id="add" type="button" class="btn btn-primary" value="Add new step" />
+</center>
+<input id="upload" type="button" class="btn btn-primary" value="upl" />
+<script type="text/javascript">
+    $(function () {
+        var items = JSON.parse('@ViewBag.Tags');
+        function split(val) {
+            return val.split(/\s*/);
+        }
+        function extractLast(term) {
+            return split(term).pop();
+        }
+
+        $("#tag").
+            autocomplete({
+                minLength: 0,
+                source: function (request, response) {
+                    response($.ui.autocomplete.filter(
+                        items, extractLast(request.term)));
+                },
+                focus: function () {
+                    return false;
+                },
+                select: function (event, ui) {
+                    var terms = split(this.value);
+                    terms.pop();
+                    terms.push(ui.item.value);
+                    terms.push("");
+                    this.value = terms.join("");
+                    return false;
+                }
+            });
+    });
+</script>
+<script type="text/javascript">
+    $('#add').on('click', function (e) {
+
+        Add();
+    });
+    function Add() {
+        $.ajax({
+            url: '/Records/NewStep',
+            type: 'POST',
+            cache: false,
+            async: true,
+            dataType: "html",
+        })
+            .done(function (result) {
+                $('#Steps').append(result);
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })
+    };
+</script>

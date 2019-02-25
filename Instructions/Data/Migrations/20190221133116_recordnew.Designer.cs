@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Instructions.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190220111309_migration")]
-    partial class migration
+    [Migration("20190221133116_recordnew")]
+    partial class recordnew
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,25 @@ namespace Instructions.Data.Migrations
                 .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("Instructions.Models.Record", b =>
+                {
+                    b.Property<int>("RecordID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("ThemeName");
+
+                    b.Property<string>("USerID");
+
+                    b.HasKey("RecordID");
+
+                    b.ToTable("Records");
+                });
 
             modelBuilder.Entity("Instructions.Models.User", b =>
                 {
@@ -59,6 +78,8 @@ namespace Instructions.Data.Migrations
                     b.Property<bool>("RoleISAdmin");
 
                     b.Property<string>("SecurityStamp");
+
+                    b.Property<bool>("Status");
 
                     b.Property<bool>("TwoFactorEnabled");
 
