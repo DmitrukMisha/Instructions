@@ -1,10 +1,16 @@
 {
   "version": "1.0",
   "defaultProvider": "cdnjs",
-  "libraries": [{
-  "provider": "cdnjs",
-  "library": "jqueryui@1.12.1",
-  "destination": "wwwroot/lib/jqueryui/"
-}
-]
+  "libraries": [
+    {
+      "provider": "cdnjs",
+      "library": "jqueryui@1.12.1",
+      "destination": "wwwroot/lib/jqueryui/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "dropzone@5.5.1",
+      "destination": "wwwroot/lib/dropzone/"
+    }
+  ]
 }

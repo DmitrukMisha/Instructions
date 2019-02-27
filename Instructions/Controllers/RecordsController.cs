@@ -21,6 +21,8 @@ namespace Instructions.Controllers
             private readonly UserManager<User> _userManager;
             private ApplicationDbContext Recordcontext;
             IConfiguration Configuration;
+            static int id;
+            
 
         public RecordsController(ApplicationDbContext context,UserManager<User> userManager, IConfiguration configuration)
             {
@@ -37,13 +39,15 @@ namespace Instructions.Controllers
             var tags = Recordcontext.Tags.Select(t => t.TagName).ToList().Distinct();
             ViewBag.Tags =new HtmlString(JsonConvert.SerializeObject(tags,Formatting.None)) ;
             ViewBag.Themes= Recordcontext.Themes.ToList();
+            id = 0;
             return View();
             }
         [HttpPost]
         public IActionResult NewStep()
         {
-           
-            return PartialView();
+            id++;
+            ViewData["id"] = id;
+           return PartialView();
         }
 
 
@@ -106,20 +110,32 @@ namespace Instructions.Controllers
             return container;
         }
         [HttpPost]
-        public async Task<IActionResult> UploadFiles()
+        public async Task UploadFiles()
         {
             var files = Request.Form.Files;
-            CloudBlobContainer container = GetCloudBlobContainer("images");
+            /*CloudBlobContainer container = GetCloudBlobContainer("images");
             var result=container.CreateIfNotExistsAsync().Result;       
             foreach (var file in files)
             {
                 CloudBlockBlob blob = container.GetBlockBlobReference(file.Name);
                 await blob.UploadFromStreamAsync(file.OpenReadStream());
-            }
-            return Json("files uploaded successfully!");
+            }*/
         }
-        
-     }
+        [HttpPost]
+        public async Task UploadFilesFromStep()
+        {
+            var files = Request.Form.Files;
+            /*CloudBlobContainer container = GetCloudBlobContainer("images");
+            var result=container.CreateIfNotExistsAsync().Result;       
+            foreach (var file in files)
+            {
+                CloudBlockBlob blob = container.GetBlockBlobReference(file.Name);
+                await blob.UploadFromStreamAsync(file.OpenReadStream());
+            }*/
+            files.ToString();
+        }
+       
+    }
     
 }
    
