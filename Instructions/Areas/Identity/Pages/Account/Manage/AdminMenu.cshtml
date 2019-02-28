@@ -7,37 +7,30 @@
 
 }
 
-
 <h4>@ViewData["Title"]</h4>
-
-<p>TYT ADMIN SIDIT</p>
-
 <form method="post">
     <table class="table">
         <tr>
-
             <th>
-                <button type="submit" asp-action="Lock" class="btn btn-sm btn-warning"> Lock</button>
+                <button type="submit" asp-controller="Home" asp-action="Lock" class="btn btn-sm btn-warning"> Lock</button>
             </th>
             <th>
-                <button type="submit" asp-action="Unlock" class="btn btn-sm btn-success"> Unlock</button>
+                <button type="submit" asp-controller="Home" asp-action="Unlock" class="btn btn-sm btn-success"> Unlock</button>
             </th>
             <th>
-                <button type="submit" asp-action="Delete" class="btn btn-sm btn-danger"> Delete</button>
+                <button type="submit" asp-controller="Home" asp-action="Delete" class="btn btn-sm btn-danger"> Delete</button>
             </th>
+            <th></th>
         </tr>
         <tr>
             <th>
                 <input type="checkbox" onClick="toggle(this)" /> Toggle All<br />
             </th>
             <th>
+                Username
+            </th>
+            <th>
                 Email
-            </th>
-            <th>
-                First In
-            </th>
-            <th>
-                Last In
             </th>
             <th>
                 User Status
@@ -48,8 +41,8 @@
             <tr>
                 <th>
                     <input type="checkbox" name="selected" value="@user.Id" />
-
                 </th>
+                <td>@user.UserName</td>
                 <td>@user.Email</td>
                 <td>
                     @if (user.Status)
@@ -70,8 +63,6 @@
         }
     }
 </script>
-
-
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
