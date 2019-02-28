@@ -6,7 +6,6 @@
     ViewBag.Title = "Record creating";
 }
 <script src="~/lib/dropzone/dropzone.js"></script>
-<center><h3>Images uploading</h3></center>
 <!--<form asp-controller="records" asp-action="UploadFiles" asp-antiforgery="false" class="dropzone" id="UploadFormRecord" enctype="multipart/form-data">
     <div class="fallback">
         <input name="file" type="file" multiple />
@@ -47,7 +46,9 @@
             <input type="submit" value="Create new record" class="btn btn-default" />
         </div>
     </center>
-    <div id="Steps"></div>
+    <div class="container">
+        <div id="Steps"></div>
+     </div>
 </form>
 <center>
     <input id="add" type="button" class="btn btn-primary" value="Add new step" />

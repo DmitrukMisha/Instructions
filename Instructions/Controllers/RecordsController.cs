@@ -99,7 +99,7 @@ namespace Instructions.Controllers
                 await CreateSteps( StepName,Text, record);
                 if (Tags != null)           
                 await CreateTags(record, Tags);
-                return RedirectToAction("Index");
+                return Redirect("/home");
             }
         private CloudBlobContainer GetCloudBlobContainer(string RecordID)
         {

@@ -21,7 +21,7 @@ namespace Instructions.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IStringLocalizer<HomeController> _localizer;
-
+        static Record record;
         public HomeController(IStringLocalizer<HomeController> localizer, UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context)
         {
             _userManager = userManager;
@@ -40,6 +40,7 @@ namespace Instructions.Controllers
         }
         public IActionResult Record(string id)
         {
+            record = GetRecord(id);
             GetRecordData(id);
             return View(GetSteps(GetRecord(id)));
         }
@@ -88,8 +89,27 @@ namespace Instructions.Controllers
             }
         }
 
+        public IActionResult Comments()
+        {
+            List<Comment> comments = new List<Comment> { new Comment { Text = "sss" }, new Comment { Text="sqwrqrqwr"} }; // DbContext.Comments.Where(a => a.Record == record).ToList();
+            return PartialView(comments);
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateComment(string Text)
+        {
+            Comment comment = new Comment
+            {
+                Text = Text,
+                RecordID = record,
+               
+        };
+            User user = await _userManager.GetUserAsync(User);
+            comment.UserID = user.Id;
+            DbContext.Comments.Add(comment);
+            await DbContext.SaveChangesAsync();
+            return PartialView(comment.Text);
 
-
+        }
         public async Task<IActionResult> Enter(string returnUrl)
         {
             var unlocked = IsLocked(User.Identity.Name);

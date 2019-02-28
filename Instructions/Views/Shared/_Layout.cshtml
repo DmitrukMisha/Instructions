@@ -12,7 +12,7 @@
     }
     string style = Context.Request.Cookies["style"];
     string Btn_style_name;
-     if (style.Contains("default"))
+     if (style!=null&&style.Contains("default"))
     {
         Btn_style_name = Localizer["Dark theme"].Value;
      }

@@ -19,6 +19,25 @@ namespace Instructions.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("Instructions.Models.Comment", b =>
+                {
+                    b.Property<int>("CommentID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("RecordID1");
+
+                    b.Property<string>("Text");
+
+                    b.Property<string>("UserID");
+
+                    b.HasKey("CommentID");
+
+                    b.HasIndex("RecordID1");
+
+                    b.ToTable("Comments");
+                });
+
             modelBuilder.Entity("Instructions.Models.Record", b =>
                 {
                     b.Property<int>("RecordID")
@@ -262,6 +281,13 @@ namespace Instructions.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("Instructions.Models.Comment", b =>
+                {
+                    b.HasOne("Instructions.Models.Record", "RecordID")
+                        .WithMany()
+                        .HasForeignKey("RecordID1");
                 });
 
             modelBuilder.Entity("Instructions.Models.Step", b =>

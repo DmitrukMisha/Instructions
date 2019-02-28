@@ -1,0 +1,12 @@
+﻿@model IEnumerable<Instructions.Models.Comment>
+
+<table class="table">
+    
+        @foreach (var item in Model)
+        {
+            <tr>
+                @item.Text
+            </tr>
+        }
+
+</table>
