@@ -27,15 +27,8 @@ namespace Instructions.Areas.Identity.Pages.Account.Manage
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
-           
 
             return Page();
         }
-        public IActionResult createRec()
-        {
-            return Redirect("~/Controllers/Records");
-        }
-
-
     }
 }
