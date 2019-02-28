@@ -1,8 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Instructions.Data;
 using Instructions.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Instructions.Areas.Identity.Pages.Account.Manage
@@ -11,18 +15,22 @@ namespace Instructions.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<User> _userManager;
         private readonly ILogger<PersonalInstructionsModel> _logger;
-
-        public PersonalInstructionsModel(
+        private readonly ApplicationDbContext _context;
+        public PersonalInstructionsModel(ApplicationDbContext db,
             UserManager<User> userManager,
             ILogger<PersonalInstructionsModel> logger)
         {
+            _context = db;
             _userManager = userManager;
             _logger = logger;
         }
 
-        public async Task<IActionResult> OnGet()
+        public List<Record> Records { get; set; }
+
+    public async Task<IActionResult> OnGet()
         {
-            var user = await _userManager.GetUserAsync(User);
+            Records=  _context.Records.ToList();
+              var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");

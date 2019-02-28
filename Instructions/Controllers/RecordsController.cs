@@ -134,7 +134,33 @@ namespace Instructions.Controllers
             }*/
             files.ToString();
         }
-       
+
+        [HttpPost]
+        public async Task<ActionResult> Delete(string[] selected)
+        {
+            if (selected != null)
+            {
+                foreach (var id in selected)
+                {
+                    var record = await Recordcontext.Records.FindAsync(Int32.Parse(id));
+                    
+                    
+                    if (record != null)
+                    {
+                        List<Step> steps = Recordcontext.Steps.Where(a => a.RecordID == record).ToList();
+                        foreach(var step in steps)
+                        {
+                            Recordcontext.Steps.Remove(step);
+                        }
+                        Recordcontext.Records.Remove(record);
+                        await Recordcontext.SaveChangesAsync();
+                    }
+                }
+            }
+            return Redirect("~/Identity/Account/Manage/PersonalInstructions");
+        }
+
+
     }
     
 }

@@ -1,12 +1,61 @@
 ﻿@page
 @model PersonalInstructionsModel
+
 @{
     ViewData["Title"] = "Instructions";
     ViewData["ActivePage"] = ManageNavPages.PersonalInstructions;
+    
 }
 
+
 <h4>@ViewData["Title"]</h4>
-<input type="button" value="Add new instruction" onclick="window.location='@Url.Action("Index", "Records")'" class="btn btn-primary" />
-    @section Scripts {
-        <partial name="_ValidationScriptsPartial" />
+
+
+<form method="post">
+    <table class="table">
+        <tr>
+            <th><input type="button" value="Add new instruction" onclick="window.location='@Url.Action("Index", "Records")'" class="btn btn-sm btn-success" /></th>
+            <th>
+                <button type="submit" asp-controller="Records" asp-action="Delete" class="btn btn-sm btn-danger"> Delete</button>
+            </th>
+            <th></th><th></th>
+        </tr>
+        <tr>
+            <th>
+                <input type="checkbox" onClick="toggle(this)" /> Toggle All<br />
+            </th>
+            <th>
+                Record name
+            </th>
+            <th>
+                Theme name
+            </th>
+            <th>
+                Theme description
+            </th>
+        </tr>
+        @foreach (Record item in Model.Records)
+        {
+            <tr>
+                <th>
+                    <input type="checkbox" name="selected" value="@item.RecordID" />
+                </th>
+                <td>@item.Name</td>
+                <td>@item.ThemeName</td>
+                <td>@item.Description</td>
+            </tr>
+
+        }
+    </table>
+</form>
+<script language="JavaScript">
+    function toggle(source) {
+        checkboxes = document.getElementsByName('selected');
+        for (var i = 0, n = checkboxes.length; i < n; i++) {
+            checkboxes[i].checked = source.checked;
+        }
     }
+</script>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

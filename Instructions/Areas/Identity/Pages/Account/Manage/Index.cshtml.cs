@@ -36,7 +36,7 @@ namespace Instructions.Areas.Identity.Pages.Account.Manage
         public string StatusMessage { get; set; }
 
         [BindProperty]
-        public InputModel Input { get; set; }
+        public InputModelIndex Input { get; set; }
 
 
 
@@ -56,7 +56,7 @@ namespace Instructions.Areas.Identity.Pages.Account.Manage
 
             Username = userName;
 
-            Input = new InputModel
+            Input = new InputModelIndex
             {
                 Email = email,
                 PhoneNumber = phoneNumber
