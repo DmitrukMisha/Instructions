@@ -5,6 +5,14 @@
 @{
     ViewBag.Title = "Record creating";
 }
+<script src="~/lib/dropzone/dropzone.js"></script>
+<center><h3>Images uploading</h3></center>
+<!--<form asp-controller="records" asp-action="UploadFiles" asp-antiforgery="false" class="dropzone" id="UploadFormRecord" enctype="multipart/form-data">
+    <div class="fallback">
+        <input name="file" type="file" multiple />
+        <input type="submit" value="Upload" />
+    </div>
+</form>-->
 <form asp-action="create" asp-controller="records">
     <div class="form-group">
         <label asp-for="Name" class="control-label">Name</label>
@@ -28,22 +36,22 @@
         <label class="control-label">Tags</label>
         <input id="tag" type="text" class="form-control" name="Tags" />
     </div>
+    <div class="clsbox-1" runat="server">
+        <div class="dropzone clsbox" id="UploadFormRecord">
+
+        </div>
+    </div>
+    <br />  
     <center>
         <div class="form-group">
-            <input type="submit" value="Save" class="btn btn-default" />
+            <input type="submit" value="Create new record" class="btn btn-default" />
         </div>
     </center>
-    <div id="fileBasket" class="filebasket">
-        Drag-n-Drop files here.
-    </div>
-    <br />
     <div id="Steps"></div>
 </form>
-
 <center>
     <input id="add" type="button" class="btn btn-primary" value="Add new step" />
 </center>
-<input id="upload" type="button" class="btn btn-primary" value="upl" />
 <script type="text/javascript">
     $(function () {
         var items = JSON.parse('@ViewBag.Tags');
@@ -94,4 +102,15 @@
                 console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
             })
     };
+</script>
+<script type="text/javascript">
+    Dropzone.autoDiscover = false;
+    var myDropzone = new Dropzone("div#UploadFormRecord", {
+        url: "Records/UploadFiles",
+        maxFiles: 1,
+        maxfilesexceeded: function (file) {
+            alert("Only one file here");
+            this.removeFile(file);
+        } });
+    
 </script>
