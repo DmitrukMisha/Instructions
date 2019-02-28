@@ -5,80 +5,228 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Instructions.Models;
-using Instructions.Data;
+using Microsoft.Extensions.Localization;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using System.Text;
 
 namespace Instructions.Controllers
 {
     public class HomeController : Controller
     {
-        private ApplicationDbContext DbContext;
         private readonly UserManager<User> _userManager;
-        public HomeController(ApplicationDbContext context, UserManager<User> userManager)
+        private readonly SignInManager<User> _signInManager;
+        private readonly IStringLocalizer<HomeController> _localizer;
+
+        public HomeController(IStringLocalizer<HomeController> localizer,UserManager<User> userManager, SignInManager<User> signInManager)
         {
-
             _userManager = userManager;
-            DbContext = context;
-
+            _signInManager = signInManager;
+            _localizer = localizer;
         }
+
         public IActionResult Index()
         {
-            List<Record> records = DbContext.Records.ToList();
-            records.Reverse();
-            GetTags(records);
-            AuthorDataView(records);
-            return View(records);
-        }
-        public IActionResult Record(string id)
-        {
-            GetRecordData(id);
-            return View(GetSteps(GetRecord(id)));
+            ViewData["Title"] = _localizer["Header"];
+            ViewData["Message"] = _localizer["Message"];
+
+            return View();
         }
 
-        public void GetRecordData(string id)
+        public async Task<IActionResult> Enter (string returnUrl)
         {
-            Record record = GetRecord(id);
-            ViewData["Name"] = record.Name;
-            ViewData["Theme"] = record.ThemeName;
-            ViewData["Author"] = GetAuthorName(record);
-        }
-
-        public Record GetRecord(string id)
-        {
-            int idNumeric = Convert.ToInt32(id);
-            return DbContext.Records.Where(a => a.RecordID == idNumeric).SingleOrDefault();
-        }
-        public List<Step> GetSteps(Record record)
-        {
-             return DbContext.Steps.Where(a => a.RecordID == record).ToList();
-        }
-
-        public void GetTags(List<Record> records)
-        {
-            foreach (Record record in records)
+            var unlocked = IsLocked(User.Identity.Name);
+            unlocked.Wait();
+            if (unlocked.Result)
             {
-                var tags = DbContext.Tags.Where(a => a.Record == record).Select(p=>p.TagName).ToList() ;
-                var sb = new StringBuilder();
-                tags.ForEach(s => sb.Append(s));
-                var combinedList = sb.ToString();
-                ViewData[record.RecordID.ToString()] = combinedList;
+                return RedirectToAction("SetLanguage", "Home", new { culture = "", returnUrl });
+            }
+            else
+                await _signInManager.SignOutAsync();
+            return Redirect("~/Identity/Account/Lockout");
+        }
+
+        private async Task<bool> IsLocked(string name)
+        {
+            User user = await _userManager.FindByNameAsync(name);
+            if (user.Status)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public IActionResult SetLanguage(string culture, string returnUrl)
+        {
+            if (_signInManager.IsSignedIn(User))
+            {
+                if (culture == null)
+                {
+                   culture= UserLogin();
+                }
+                else
+                {
+                    var task = ChangeCulture(culture);
+                    task.Wait();
+                }
+            }
+            Response.Cookies.Append(
+                CookieRequestCultureProvider.DefaultCookieName,
+                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+                new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
+            );
+
+            return LocalRedirect(returnUrl);
+        }
+
+        public string UserLogin()
+        {
+            var getCulture = GetUserCulture();
+            getCulture.Wait();
+           string culture = getCulture.Result;
+            var AddStyle = AddUserStyleToCookie();
+            AddStyle.Wait();
+            return culture;
+        }
+
+        public async Task<User> ChangeCulture(string culture)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            user.Language = culture;
+            await _userManager.UpdateAsync(user);
+            return user;
+        }
+
+        public async Task<User> GetUser()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            return user;
+        }
+
+        public async Task<User> AddUserStyleToCookie()
+        {
+            User user = await GetUser();
+            AddStyleToCookie(user.Color);
+            return user;
+        }
+
+        public void AddStyleToCookie(string style)
+        {
+            Response.Cookies.Append("style", style);
+        }
+
+        public async Task<string> GetUserCulture()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            return user.Language;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeColor(string returnUrl)
+        {
+            User user = await GetUser();
+            string bootstrapDarkly = "bootstrap-darkly.css";
+            string bootstrapDefault = "bootstrap-default.css";
+            var CookiesValue = Request.Cookies["style"];
+            if (CookiesValue == bootstrapDefault)
+            {
+                AddStyleToCookie(bootstrapDarkly);
+                CookiesValue = bootstrapDarkly;
+            }
+            else
+            {
+                AddStyleToCookie(bootstrapDefault);
+                CookiesValue = bootstrapDefault;
+            }
+
+            if (_signInManager.IsSignedIn(User))
+            {
+                user.Color = CookiesValue;
+                await _userManager.UpdateAsync(user);
+            }
+            return LocalRedirect(returnUrl);
+        }
+    
+        public async Task UpdateUserStyle()
+        {
+            if (_signInManager.IsSignedIn(User))
+            {
+                User user = await GetUser();
+             var CookiesValue = Request.Cookies["style"];
+                user.Color = CookiesValue;
+                await _userManager.UpdateAsync(user);
             }
         }
-        
-        public string GetAuthorName(Record record)
+
+
+        [HttpPost]
+        public async Task<ActionResult> Delete(string[] selected)
         {
-            string Name = DbContext.Users.Where(a => a.Id == record.USerID).Select(p => p.UserName).SingleOrDefault();
-            return Name;
-        }
-        
-        public void AuthorDataView(List<Record> records)
-        {
-            foreach (Record record in records)
+            bool IsI = false;
+            if (selected != null)
             {
-                ViewData["author" + record.RecordID.ToString()] = GetAuthorName(record);
+                foreach (var id in selected)
+                {
+                    User user = await _userManager.FindByIdAsync(id);
+                    if (user != null)
+                    {
+                        if (User.Identity.Name == user.Email) IsI = true;
+                        IdentityResult result = await _userManager.DeleteAsync(user);
+                    }
+                }
             }
+            if (IsI)
+            {
+                await _signInManager.SignOutAsync();
+                return Redirect("~/Identity/Account/Logout");
+
+            }
+            else return Redirect("~/Identity/Account/Manage/AdminMenu");
         }
+
+
+        [HttpPost]
+        public async Task<ActionResult> Lock(string[] selected)
+        {
+
+            if (selected != null)
+            {
+                foreach (var id in selected)
+                {
+                    User user = await _userManager.FindByIdAsync(id);
+                    if (user != null)
+                    {
+
+                        user.Status = false;
+                        await _userManager.UpdateAsync(user);
+                    }
+                }
+            }
+
+            return Redirect("~/Identity/Account/Manage/AdminMenu");
+        }
+
+
+        [HttpPost]
+        public async Task<ActionResult> Unlock(string[] selected)
+        {
+            if (selected != null)
+            {
+                foreach (var id in selected)
+                {
+                    User user = await _userManager.FindByIdAsync(id);
+                    if (user != null)
+                    {
+                        user.Status = true;
+                        await _userManager.UpdateAsync(user);
+                    }
+                }
+            }
+            return Redirect("~/Identity/Account/Manage/AdminMenu");
+        }
+
+
+        
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

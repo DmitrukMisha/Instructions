@@ -12,6 +12,7 @@ html {
 body {
   margin: 0;
 }
+
 article,
 aside,
 details,
@@ -42,7 +43,6 @@ audio:not([controls]) {
 template {
   display: none;
 }
-
 a {
   background-color: transparent;
 }

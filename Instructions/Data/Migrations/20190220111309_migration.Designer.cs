@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Instructions.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190221192043_stepchange")]
-    partial class stepchange
+    [Migration("20190220111309_migration")]
+    partial class migration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,44 +20,6 @@ namespace Instructions.Data.Migrations
                 .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("Instructions.Models.Record", b =>
-                {
-                    b.Property<int>("RecordID")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Description");
-
-                    b.Property<string>("Name");
-
-                    b.Property<string>("ThemeName");
-
-                    b.Property<string>("USerID");
-
-                    b.HasKey("RecordID");
-
-                    b.ToTable("Records");
-                });
-
-            modelBuilder.Entity("Instructions.Models.Step", b =>
-                {
-                    b.Property<int>("StepID")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name");
-
-                    b.Property<int?>("RecordID1");
-
-                    b.Property<string>("Text");
-
-                    b.HasKey("StepID");
-
-                    b.HasIndex("RecordID1");
-
-                    b.ToTable("Steps");
-                });
 
             modelBuilder.Entity("Instructions.Models.User", b =>
                 {
@@ -97,8 +59,6 @@ namespace Instructions.Data.Migrations
                     b.Property<bool>("RoleISAdmin");
 
                     b.Property<string>("SecurityStamp");
-
-                    b.Property<bool>("Status");
 
                     b.Property<bool>("TwoFactorEnabled");
 
@@ -230,13 +190,6 @@ namespace Instructions.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
-                });
-
-            modelBuilder.Entity("Instructions.Models.Step", b =>
-                {
-                    b.HasOne("Instructions.Models.Record", "RecordID")
-                        .WithMany()
-                        .HasForeignKey("RecordID1");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

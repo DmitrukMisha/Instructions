@@ -2,22 +2,22 @@
 
 namespace Instructions.Data.Migrations
 {
-    public partial class recordnew : Migration
+    public partial class color : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "USerID",
-                table: "Records",
+                name: "Color",
+                table: "AspNetUsers",
                 nullable: true,
-                oldClrType: typeof(int));
+                oldClrType: typeof(bool));
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<int>(
-                name: "USerID",
-                table: "Records",
+            migrationBuilder.AlterColumn<bool>(
+                name: "Color",
+                table: "AspNetUsers",
                 nullable: false,
                 oldClrType: typeof(string),
                 oldNullable: true);
