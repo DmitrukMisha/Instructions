@@ -4,14 +4,16 @@ using Instructions.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Instructions.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190221205905_theme")]
+    partial class theme
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,23 +57,6 @@ namespace Instructions.Data.Migrations
                     b.HasIndex("RecordID1");
 
                     b.ToTable("Steps");
-                });
-
-            modelBuilder.Entity("Instructions.Models.Tag", b =>
-                {
-                    b.Property<int>("TagID")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("RecordID");
-
-                    b.Property<string>("TagName");
-
-                    b.HasKey("TagID");
-
-                    b.HasIndex("RecordID");
-
-                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("Instructions.Models.Theme", b =>
@@ -265,13 +250,6 @@ namespace Instructions.Data.Migrations
                     b.HasOne("Instructions.Models.Record", "RecordID")
                         .WithMany()
                         .HasForeignKey("RecordID1");
-                });
-
-            modelBuilder.Entity("Instructions.Models.Tag", b =>
-                {
-                    b.HasOne("Instructions.Models.Record", "Record")
-                        .WithMany()
-                        .HasForeignKey("RecordID");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
