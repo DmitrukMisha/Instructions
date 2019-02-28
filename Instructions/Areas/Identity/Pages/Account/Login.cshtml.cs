@@ -10,6 +10,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Localization;
+using Instructions.Controllers;
 
 namespace Instructions.Areas.Identity.Pages.Account
 {
@@ -17,12 +21,16 @@ namespace Instructions.Areas.Identity.Pages.Account
     public class LoginModel : PageModel
     {
         private readonly SignInManager<User> _signInManager;
+ 
         private readonly ILogger<LoginModel> _logger;
-
-        public LoginModel(SignInManager<User> signInManager, ILogger<LoginModel> logger)
+        private readonly IStringLocalizer<LoginModel> _localizer;
+        public LoginModel(SignInManager<User> signInManager, ILogger<LoginModel> logger,  IStringLocalizer<LoginModel> localizer)
         {
+      
             _signInManager = signInManager;
             _logger = logger;
+            _localizer = localizer;
+
         }
 
         [BindProperty]
@@ -35,27 +43,15 @@ namespace Instructions.Areas.Identity.Pages.Account
         [TempData]
         public string ErrorMessage { get; set; }
 
-        public class InputModel
-        {
-            [Required]
-            [Display(Name = "Email/Username")]
-            public string Email { get; set; }
-
-            [Required]
-            [DataType(DataType.Password)]
-            public string Password { get; set; }
-
-            [Display(Name = "Remember me?")]
-            public bool RememberMe { get; set; }
-        }
-
+       
         public async Task OnGetAsync(string returnUrl = null)
         {
+            
             if (!string.IsNullOrEmpty(ErrorMessage))
             {
                 ModelState.AddModelError(string.Empty, ErrorMessage);
             }
-
+            
             returnUrl = returnUrl ?? Url.Content("~/");
 
             // Clear the existing external cookie to ensure a clean login process
@@ -65,6 +61,8 @@ namespace Instructions.Areas.Identity.Pages.Account
 
             ReturnUrl = returnUrl;
         }
+
+        
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
@@ -77,8 +75,8 @@ namespace Instructions.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
+                    return RedirectToAction("Enter", "Home", new { returnUrl });
+                    // return LocalRedirect(returnUrl);
                 }
 
                 if (result.RequiresTwoFactor)
@@ -87,12 +85,12 @@ namespace Instructions.Areas.Identity.Pages.Account
                 }
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning("User account locked out.");
+                    _logger.LogWarning(_localizer["User account locked out."]);
                     return RedirectToPage("./Lockout");
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, _localizer["Invalid login attempt."]);
                     return Page();
                 }
             }

@@ -1,4 +1,28 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+    var user = await UserManager.GetUserAsync(User);
+
+    if (!Context.Request.Cookies.ContainsKey("style"))
+    {
+        Context.Response.Cookies.Append("style", "bootstrap-default.css");
+    }
+    string style = Context.Request.Cookies["style"];
+    string Btn_style_name;
+    if (style.Contains("default"))
+    {
+        Btn_style_name = Localizer["Dark theme"].Value;
+    }
+    else { Btn_style_name = Localizer["Light theme"].Value; }
+}
+
+
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -6,46 +30,68 @@
     <title>@ViewData["Title"] - Instructions</title>
 
     <environment include="Development">
-        <link href="~/lib/dropzone/dropzone.css" rel="stylesheet" />
-        <link href="~/lib/jqueryui/jquery-ui.min.css" rel="stylesheet" />
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/@style" />
         <link rel="stylesheet" href="~/css/site.css" />
+
     </environment>
     <environment exclude="Development">
-        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/4.2.1/css/bootstrap.min.css"
               asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
-         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
-        <!-- <link rel="stylesheet" href="~/lib/jqueryui/jquery-ui.min.css" asp-append-version="true" type="text/css" />-->
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+
     </environment>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    
 </head>
+
 <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Instructions</a>
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                </ul>
-                <partial name="_LoginPartial" />
-            </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Instructions</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link">@Localizer["Home"] <span class="sr-only"></span></a>
+                </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="text" placeholder="@Localizer["Search"]" aria-label="@Localizer["Search"]">
+                <button class="btn btn-success my-2 my-sm-0">@Localizer["Search"]</button>
+            </form>
+            <partial name="_LoginPartial" />
+            <div> @await Html.PartialAsync("_SelectLanguagePartial")</div>
+           
+            <form method="post">
+                <button class="btn btn-secondary my-2 my-sm-0"  asp-route-returnUrl="@Context.Request.Path" asp-controller="Home" asp-action="ChangeColor"> @Btn_style_name</button>
+            </form>
         </div>
+
+
+
     </nav>
 
+
+
     <partial name="_CookieConsentPartial" />
+
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; 2019 - Instructions</p>
+        </footer>
+    </div>
+
     <environment include="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
         <script src="~/js/site.js" asp-append-version="true"></script>
-        <script src="~/lib/jqueryui/jquery-ui.min.js"></script>
     </environment>
     <environment exclude="Development">
         <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"
@@ -62,16 +108,6 @@
         </script>
         <script src="~/js/site.min.js" asp-append-version="true"></script>
     </environment>
-
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; 2019 - Instructions</p>
-        </footer>
-    </div>
-
-    
 
     @RenderSection("Scripts", required: false)
 </body>

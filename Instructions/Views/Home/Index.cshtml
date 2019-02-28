@@ -1,27 +1,6 @@
-﻿@model IEnumerable<Instructions.Models.Record>
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
-@{
-    ViewData["Title"] = "Index";
-}
-
-@foreach (Record item in Model)
-{
-<div class="jumbotron">
-    <p class="display-3" align="center"> <a asp-controller="Home" asp-action="Record" asp-route-id="@item.RecordID">@item.Name</a></p>
-    <div class="row">
-        <div class="col-md-10">
-            <h5>@ViewData["author" + item.RecordID.ToString()]</h5>
-        </div>
-    <div class="col-md-2" align="right">
-        <p>
-            <font color="gray" size="2">@item.ThemeName</font>
-        </p>
-    </div>
-   </div>
-        <hr />
-        <div color="gray">@item.Description</div>
-        <hr />
-        <p><font color="gray" size="2">@ViewData[item.RecordID.ToString()] </font></p>
-    </div>
-    }
+<h1>@Localizer["Header"]</h1>
+<h3>@Localizer["Message"]</h3>
 
