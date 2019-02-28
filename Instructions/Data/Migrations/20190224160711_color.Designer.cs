@@ -10,14 +10,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Instructions.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190220104513_migration")]
-    partial class migration
+    [Migration("20190224160711_color")]
+    partial class color
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
+                .HasAnnotation("ProductVersion", "2.1.8-servicing-32085")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -28,7 +28,7 @@ namespace Instructions.Data.Migrations
 
                     b.Property<int>("AccessFailedCount");
 
-                    b.Property<bool>("Color");
+                    b.Property<string>("Color");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
@@ -59,6 +59,8 @@ namespace Instructions.Data.Migrations
                     b.Property<bool>("RoleISAdmin");
 
                     b.Property<string>("SecurityStamp");
+
+                    b.Property<bool>("Status");
 
                     b.Property<bool>("TwoFactorEnabled");
 

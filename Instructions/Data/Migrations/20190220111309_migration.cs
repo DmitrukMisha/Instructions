@@ -6,12 +6,6 @@ namespace Instructions.Data.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
-                name: "Color",
-                table: "AspNetUsers",
-                nullable: false,
-                defaultValue: false);
-
             migrationBuilder.AddColumn<string>(
                 name: "Language",
                 table: "AspNetUsers",
@@ -26,10 +20,6 @@ namespace Instructions.Data.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Color",
-                table: "AspNetUsers");
-
             migrationBuilder.DropColumn(
                 name: "Language",
                 table: "AspNetUsers");

@@ -10,7 +10,7 @@ namespace Instructions.Models
     public class User : IdentityUser
     {
         public string Language { get; set; }
-        public bool Color { get; set; }
+        public string Color { get; set; }
         public bool RoleISAdmin { get; set; }
         public bool Status { get; set; }
     }
