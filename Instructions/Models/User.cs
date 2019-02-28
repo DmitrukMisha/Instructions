@@ -1,4 +1,3 @@
-
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ namespace Instructions.Models
     public class User : IdentityUser
     {
         public string Language { get; set; }
-        public string Color { get; set; }
+        public bool Color { get; set; }
         public bool RoleISAdmin { get; set; }
         public bool Status { get; set; }
     }
