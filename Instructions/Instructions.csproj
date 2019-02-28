@@ -10,6 +10,8 @@
     <Compile Remove="Data\Migrations\20190221133914_Steps.Designer.cs" />
     <Compile Remove="Data\Migrations\20190221133953_Step.cs" />
     <Compile Remove="Data\Migrations\20190221133953_Step.Designer.cs" />
+    <Compile Remove="Data\Migrations\20190228133950_SLILI.cs" />
+    <Compile Remove="Data\Migrations\20190228133950_SLILI.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

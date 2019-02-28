@@ -24,7 +24,6 @@ namespace Instructions.Controllers
 
         public HomeController(IStringLocalizer<HomeController> localizer, UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context)
         {
-
             _userManager = userManager;
             _signInManager = signInManager;
             DbContext = context;

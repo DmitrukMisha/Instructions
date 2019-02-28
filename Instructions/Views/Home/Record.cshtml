@@ -20,7 +20,7 @@
     <!-- Индикаторы -->
     <div class="carousel-inner">
 
-        <div class="item active">
+        <div class="carousel-item active">
             <div class="jumbotron">
                 <h1>@Model.ElementAt(0).StepName</h1>
                 <hr />
@@ -31,24 +31,25 @@
 
         @for (Int32 i = 1; i < Model.Count(); i++)
         {
-        <div class="item">
-            <div class="jumbotron">
-                <h1> @Model.ElementAt(i).StepName</h1>
-                <hr />
-                <p>@Model.ElementAt(i).Text</p>
+            <div class="carousel-item">
+                <div class="jumbotron">
+                    <h1> @Model.ElementAt(i).StepName</h1>
+                    <hr />
+                    <p>@Model.ElementAt(i).Text</p>
+                </div>
             </div>
-        </div>
-            }
-        </div>
-    <!-- Элементы управления -->
-    <a class="left carousel-control" href="#carousel" role="button" data-slide="prev">
-        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-        <span class="sr-only">Предыдущий</span>
-    </a>
-    <a class="right carousel-control" href="#carousel" role="button" data-slide="next">
-        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-        <span class="sr-only">Следующий</span>
-    </a>
+        }
+
+        <!-- Элементы управления -->
+        <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Предыдущий</span>
+        </a>
+        <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Следующий</span>
+        </a>
+    </div>
 </div>
 }
 <script type="text/javascript">
