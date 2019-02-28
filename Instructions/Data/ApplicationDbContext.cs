@@ -9,10 +9,6 @@ namespace Instructions.Data
 {
     public class ApplicationDbContext : IdentityDbContext<User>
     {
-        public DbSet<Record> Records { get; set; }
-        public DbSet<Step> Steps { get; set; }
-        public DbSet<Theme> Themes { get; set; }
-        public DbSet<Tag> Tags { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
