@@ -36,7 +36,7 @@ namespace Instructions.Controllers
           
             public IActionResult Index()
             {
-            var tags = Recordcontext.Tags.Select(t => t.TagName).ToList().Distinct();
+           var tags = Recordcontext.Tags.Select(t => t.TagName).ToList().Distinct();
             ViewBag.Tags =new HtmlString(JsonConvert.SerializeObject(tags,Formatting.None)) ;
             ViewBag.Themes= Recordcontext.Themes.ToList();
             id = 0;

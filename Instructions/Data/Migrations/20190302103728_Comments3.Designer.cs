@@ -4,14 +4,16 @@ using Instructions.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Instructions.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190302103728_Comments3")]
+    partial class Comments3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,30 +33,9 @@ namespace Instructions.Data.Migrations
 
                     b.Property<string>("UserID");
 
-                    b.Property<string>("UserName");
-
                     b.HasKey("CommentID");
 
                     b.ToTable("Comments");
-                });
-
-            modelBuilder.Entity("Instructions.Models.Like", b =>
-                {
-                    b.Property<int>("LikeID")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("CommentID1");
-
-                    b.Property<string>("UserIDId");
-
-                    b.HasKey("LikeID");
-
-                    b.HasIndex("CommentID1");
-
-                    b.HasIndex("UserIDId");
-
-                    b.ToTable("Likes");
                 });
 
             modelBuilder.Entity("Instructions.Models.Record", b =>
@@ -300,17 +281,6 @@ namespace Instructions.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
-                });
-
-            modelBuilder.Entity("Instructions.Models.Like", b =>
-                {
-                    b.HasOne("Instructions.Models.Comment", "CommentID")
-                        .WithMany()
-                        .HasForeignKey("CommentID1");
-
-                    b.HasOne("Instructions.Models.User", "UserID")
-                        .WithMany()
-                        .HasForeignKey("UserIDId");
                 });
 
             modelBuilder.Entity("Instructions.Models.Step", b =>

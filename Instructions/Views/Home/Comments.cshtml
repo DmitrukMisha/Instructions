@@ -1,12 +1,121 @@
 ﻿@model IEnumerable<Instructions.Models.Comment>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
 
-<table class="table">
-    
-        @foreach (var item in Model)
+@for (Int32 i = 0; i < Model.Count(); i++)
+{
+    <div class="card border-primary mb-1" >
+        <div class="card-header">@Model.ElementAt(i).UserName</div>
+        <div class="card-body">
+            <p class="card-text">@Model.ElementAt(i).Text</p>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col align-self-end">
+                    @if (ViewBag.Likes[i])
+                    {<button type="button" class="btn btn-success " style="max-width: 3rem;" commid="@Model.ElementAt(i).CommentID">❤</button>
+                    }
+                    else
+                    { <button type="button" class="btn btn-outline-success" style="max-width: 3rem;" commid="@Model.ElementAt(i).CommentID">❤</button>}
+                    @ViewBag.LikesCount[i]
+                </div>
+            </div>
+        </div>
+        @if (User.Identity.Name == Model.ElementAt(i).UserName || (bool)ViewData["Role"])
         {
-            <tr>
-                @item.Text
-            </tr>
+            <hr />
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <input type="submit" id="delete" commid="@Model.ElementAt(i).CommentID" name="id" value="Delete" class="btn btn-danger btn-sm col-md-6" />
+                <input type="submit" id="edit" commid="@Model.ElementAt(i).CommentID" name="id" value="Edit" class="btn btn-info btn-sm col-md-6" />
+            </div>
         }
+    </div>
+}
+<script type="text/javascript">
+    $('.btn-danger').on('click', function (e) {
 
-</table>
+        $.ajax({
+            url: '/Home/DeleteComment',
+            type: 'POST',
+            cache: false,
+            async: true,
+            data: { "id": $(this).attr("commid") },
+            dataType: "html"
+        })
+            .done(function (result) {
+                $('#Comments').html(result);
+
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })
+    });
+</script>
+<script type="text/javascript">
+    $('.btn-info').on('click', function (e) {
+        if ($(this).closest('#edit').val() == "Edit") {
+            $('.btn-info').hide();
+            $(this).closest('.btn-info').show();
+            var text = $(this).closest('.card-text').text();
+            $(this).closest(".card ").append("<input type='text' name='EditComment' id='EditComment' value='" + text + "' class='form - control' />");
+            $(this).closest('#edit').val("Save");
+
+        }
+        else {
+            $.ajax({
+                url: '/Home/EditComment',
+                type: 'POST',
+                cache: false,
+                async: true,
+                data: { "id": $(this).attr("commid"), "Text": $('#EditComment').serialize() },
+                dataType: "html"
+            })
+                .done(function (result) {
+                    $('#Comments').html(result);
+                    $('#edit').val("Edit");
+                    $(this).closest("#EditComment").remove();
+
+                }).fail(function (xhr) {
+                    console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+                })
+        }
+    });
+</script>
+<script type="text/javascript">
+    $('.btn-outline-success').on('click', function (e) {
+
+        $.ajax({
+            url: '/Home/CreateLike',
+            type: 'POST',
+            cache: false,
+            async: true,
+            data: { "id": $(this).attr("commid") },
+            dataType: "html"
+        })
+            .done(function (result) {
+                $('#Comments').html(result);
+
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })
+    });
+</script>
+<script type="text/javascript">
+    $('.btn-success').on('click', function (e) {
+
+        $.ajax({
+            url: '/Home/RemoveLike',
+            type: 'POST',
+            cache: false,
+            async: true,
+            data: { "id": $(this).attr("commid") },
+            dataType: "html"
+        })
+            .done(function (result) {
+                $('#Comments').html(result);
+
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })
+    });
+</script>
