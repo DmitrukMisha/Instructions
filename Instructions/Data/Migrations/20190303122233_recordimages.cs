@@ -2,22 +2,21 @@
 
 namespace Instructions.Data.Migrations
 {
-    public partial class Status : Migration
+    public partial class recordimages : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
-                name: "Status",
-                table: "AspNetUsers",
-                nullable: false,
-                defaultValue: false);
+            migrationBuilder.AddColumn<string>(
+                name: "ImageLink",
+                table: "Records",
+                nullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Status",
-                table: "AspNetUsers");
+                name: "ImageLink",
+                table: "Records");
         }
     }
 }

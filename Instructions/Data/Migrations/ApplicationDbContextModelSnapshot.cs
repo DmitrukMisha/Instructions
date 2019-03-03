@@ -19,15 +19,78 @@ namespace Instructions.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("Instructions.Models.Comment", b =>
+                {
+                    b.Property<int>("CommentID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("RecordID");
+
+                    b.Property<string>("Text");
+
+                    b.Property<string>("UserID");
+
+                    b.Property<string>("UserName");
+
+                    b.HasKey("CommentID");
+
+                    b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("Instructions.Models.Image", b =>
+                {
+                    b.Property<int>("ImageID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Link");
+
+                    b.Property<int?>("RecordID1");
+
+                    b.Property<int?>("StepID1");
+
+                    b.HasKey("ImageID");
+
+                    b.HasIndex("RecordID1");
+
+                    b.HasIndex("StepID1");
+
+                    b.ToTable("Images");
+                });
+
+            modelBuilder.Entity("Instructions.Models.Like", b =>
+                {
+                    b.Property<int>("LikeID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("CommentID1");
+
+                    b.Property<string>("UserIDId");
+
+                    b.HasKey("LikeID");
+
+                    b.HasIndex("CommentID1");
+
+                    b.HasIndex("UserIDId");
+
+                    b.ToTable("Likes");
+                });
+
             modelBuilder.Entity("Instructions.Models.Record", b =>
                 {
                     b.Property<int>("RecordID")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .IsRequired();
 
-                    b.Property<string>("Name");
+                    b.Property<string>("ImageLink");
+
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.Property<string>("ThemeName");
 
@@ -46,9 +109,11 @@ namespace Instructions.Data.Migrations
 
                     b.Property<int?>("RecordID1");
 
-                    b.Property<string>("StepName");
+                    b.Property<string>("StepName")
+                        .IsRequired();
 
-                    b.Property<string>("Text");
+                    b.Property<string>("Text")
+                        .IsRequired();
 
                     b.HasKey("StepID");
 
@@ -94,7 +159,7 @@ namespace Instructions.Data.Migrations
 
                     b.Property<int>("AccessFailedCount");
 
-                    b.Property<bool>("Color");
+                    b.Property<string>("Color");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
@@ -258,6 +323,28 @@ namespace Instructions.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("Instructions.Models.Image", b =>
+                {
+                    b.HasOne("Instructions.Models.Record", "RecordID")
+                        .WithMany()
+                        .HasForeignKey("RecordID1");
+
+                    b.HasOne("Instructions.Models.Step", "StepID")
+                        .WithMany()
+                        .HasForeignKey("StepID1");
+                });
+
+            modelBuilder.Entity("Instructions.Models.Like", b =>
+                {
+                    b.HasOne("Instructions.Models.Comment", "CommentID")
+                        .WithMany()
+                        .HasForeignKey("CommentID1");
+
+                    b.HasOne("Instructions.Models.User", "UserID")
+                        .WithMany()
+                        .HasForeignKey("UserIDId");
                 });
 
             modelBuilder.Entity("Instructions.Models.Step", b =>

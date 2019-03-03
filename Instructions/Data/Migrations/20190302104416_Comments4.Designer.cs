@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Instructions.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190221134434_Step")]
-    partial class Step
+    [Migration("20190302104416_Comments4")]
+    partial class Comments4
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,15 +21,36 @@ namespace Instructions.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("Instructions.Models.Comment", b =>
+                {
+                    b.Property<int>("CommentID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("RecordID");
+
+                    b.Property<string>("Text");
+
+                    b.Property<string>("UserID");
+
+                    b.Property<string>("UserName");
+
+                    b.HasKey("CommentID");
+
+                    b.ToTable("Comments");
+                });
+
             modelBuilder.Entity("Instructions.Models.Record", b =>
                 {
                     b.Property<int>("RecordID")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .IsRequired();
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.Property<string>("ThemeName");
 
@@ -46,13 +67,49 @@ namespace Instructions.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("RecordID");
+                    b.Property<int?>("RecordID1");
 
-                    b.Property<string>("Text");
+                    b.Property<string>("StepName")
+                        .IsRequired();
+
+                    b.Property<string>("Text")
+                        .IsRequired();
 
                     b.HasKey("StepID");
 
+                    b.HasIndex("RecordID1");
+
                     b.ToTable("Steps");
+                });
+
+            modelBuilder.Entity("Instructions.Models.Tag", b =>
+                {
+                    b.Property<int>("TagID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("RecordID");
+
+                    b.Property<string>("TagName");
+
+                    b.HasKey("TagID");
+
+                    b.HasIndex("RecordID");
+
+                    b.ToTable("Tags");
+                });
+
+            modelBuilder.Entity("Instructions.Models.Theme", b =>
+                {
+                    b.Property<int>("ThemeID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Themes");
+
+                    b.HasKey("ThemeID");
+
+                    b.ToTable("Themes");
                 });
 
             modelBuilder.Entity("Instructions.Models.User", b =>
@@ -62,7 +119,7 @@ namespace Instructions.Data.Migrations
 
                     b.Property<int>("AccessFailedCount");
 
-                    b.Property<bool>("Color");
+                    b.Property<string>("Color");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
@@ -226,6 +283,20 @@ namespace Instructions.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("Instructions.Models.Step", b =>
+                {
+                    b.HasOne("Instructions.Models.Record", "RecordID")
+                        .WithMany()
+                        .HasForeignKey("RecordID1");
+                });
+
+            modelBuilder.Entity("Instructions.Models.Tag", b =>
+                {
+                    b.HasOne("Instructions.Models.Record", "Record")
+                        .WithMany()
+                        .HasForeignKey("RecordID");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

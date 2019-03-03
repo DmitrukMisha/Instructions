@@ -13,6 +13,9 @@ namespace Instructions.Data
         public DbSet<Step> Steps { get; set; }
         public DbSet<Theme> Themes { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<Like> Likes { get; set; }
+        public DbSet<Image> Images { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {

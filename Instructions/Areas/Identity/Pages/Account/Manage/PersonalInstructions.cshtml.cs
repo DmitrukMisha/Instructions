@@ -39,7 +39,7 @@ namespace Instructions.Areas.Identity.Pages.Account.Manage
 
             return Page();
         }
-        public IActionResult createRec()
+        public IActionResult CreateRec()
         {
             return Redirect("~/Controllers/Records");
         }
