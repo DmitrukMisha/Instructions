@@ -29,8 +29,8 @@ namespace Instructions.Areas.Identity.Pages.Account.Manage
 
     public async Task<IActionResult> OnGet()
         {
-            Records=  _context.Records.ToList();
-              var user = await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
+            Records =  _context.Records.Where(a => a.USerID == user.Id ).ToList();
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");

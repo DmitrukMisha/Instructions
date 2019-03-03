@@ -46,7 +46,7 @@
                 <th>
                     <input type="checkbox" name="selected" value="@user.Id" />
                 </th>
-                <td>@user.UserName</td>
+                <td><a asp-controller="Home" asp-route-id="@user.Id" asp-action="UserPage">@user.UserName<span class="sr-only"></span></a></td>
                 <td>@user.Email</td>
                 <td>
                     @if (user.Status)

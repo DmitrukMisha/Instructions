@@ -39,10 +39,19 @@ namespace Instructions.Controllers
             AuthorDataView(records);
             return View(records);
         }
+
         public IActionResult Record(string id)
         {
             GetRecordData(id);
             return View(GetSteps(GetRecord(id)));
+        }
+
+
+        public IActionResult UserPage(string id)
+        {
+            ViewData["Name"] = GetUserById(id);
+           
+            return View(GetRecords(GetUserById(id)));
         }
 
         public IActionResult AddTheme()
@@ -59,14 +68,25 @@ namespace Instructions.Controllers
             ViewData["Author"] = GetAuthorName(record);
         }
 
+        public User GetUserById(string id)
+        {
+            return DbContext.Users.Where(a => a.Id == id).SingleOrDefault();
+        }
+
         public Record GetRecord(string id)
         {
             int idNumeric = Convert.ToInt32(id);
             return DbContext.Records.Where(a => a.RecordID == idNumeric).SingleOrDefault();
         }
+
         public List<Step> GetSteps(Record record)
         {
              return DbContext.Steps.Where(a => a.RecordID == record).ToList();
+        }
+
+        public List<Record> GetRecords(User user)
+        {
+            return DbContext.Records.Where(a => a.USerID == user.Id).ToList();
         }
 
         public void GetTags(List<Record> records)
