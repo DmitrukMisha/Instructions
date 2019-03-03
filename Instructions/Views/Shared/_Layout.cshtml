@@ -6,18 +6,18 @@
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
     var user = await UserManager.GetUserAsync(User);
-
     if (!Context.Request.Cookies.ContainsKey("style"))
     {
-        Context.Response.Cookies.Append("style", "bootstrap-default.css");
+        Context.Response.Cookies.Append("style", "bootstrap-default.css", new Microsoft.AspNetCore.Http.CookieOptions() { IsEssential = true });
     }
     string style = Context.Request.Cookies["style"];
     string Btn_style_name;
-    if (style.Contains("default"))
+     if (style!=null&&style.Contains("default"))
     {
         Btn_style_name = Localizer["Dark theme"].Value;
-    }
-    else { Btn_style_name = Localizer["Light theme"].Value; }
+     }
+     else { 
+    Btn_style_name = Localizer["Light theme"].Value; }
 }
 
 <!DOCTYPE html>

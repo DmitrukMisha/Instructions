@@ -1,27 +1,25 @@
 ﻿@model Instructions.Models.Step
-<div class="row" id="@ViewData["id"]">
-    <h4>Step</h4>
-    <hr />
 
-
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="form-group">
-        <label asp-for="StepName" class="control-label">Step name</label>
-        <input required asp-for="StepName" class="form-control" />
-        <span asp-validation-for="StepName" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Text" class="control-label"></label>
-        <textarea required asp-for="Text" rows="5" class="form-control" />
-        <span asp-validation-for="Text" class="text-danger"></span>
-    </div>
-    <div class="clsbox-1" runat="server">
-        <div class="dropzone clsbox" id="UploadFormStep">
-
+      
+        <h4>Step</h4>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="StepName" class="control-label">Step name</label>
+            <input required asp-for="StepName" class="form-control" />
+            <span asp-validation-for="StepName" class="text-danger"></span>
         </div>
-    </div>
-    <button type="button" class="btn btn-danger del-step">Delete step</button>
-</div>
+        <div class="form-group">
+            <label asp-for="Text" class="control-label"></label>
+            <textarea required asp-for="Text" rows="5" class="form-control" />
+            <span asp-validation-for="Text" class="text-danger"></span>
+        </div>
+        <div class="clsbox-1" runat="server" >
+            <div class="dropzone clsbox step-@ViewData["id"] " id="UploadFormStep">
+
+            </div>
+        </div>
+        <button type="button" class="btn btn-danger del-step">Delete step</button>
 <script type="text/javascript">
     $(".del-step").click(function () {
         $(this).closest(".row").remove();
@@ -30,22 +28,28 @@
 </script>
 <script type="text/javascript">
     Dropzone.autoDiscover = false;
-    var myDropzone = new Dropzone("div#UploadFormStep", {
+    var el = "div.step-"+@ViewData["id"];
+    var myDropzone = new Dropzone(el, {
         url: "Records/UploadFilesFromStep",
         maxFiles: 3,
-        renameFile: function (file) {
-            file.name = new Date().getTime() + '_' + file.name;
-            console.log(file.name);
-        },
         maxfilesexceeded: function (file) {
             alert("Max 3 files here");
             this.removeFile(file);
         }
     });
-    myDropzone.on("sending", function (file, xhr, formData) {
-        // Will send the filesize along with the file as POST data.
-        formData.append("filesize", file.size);
-        formData.append("fileName", "myName");
-        console.log("sss");
+    myDropzone.on('sending', function (file, xhr, formData) {
+        $.ajax({
+            url: '/Records/GetData',
+            type: 'POST',
+            cache: false,
+            async: true,
+            data: { "id": @ViewData["id"], "filename": file.name },
+            dataType: "html"
+   
+        })
+            .fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })
+       // formData.append('userName', 'bob');
     });
 </script>

@@ -16,43 +16,100 @@
 <hr />
 @if (Model.Count() != 0)
 {
-<div id="carousel" class="carousel slide" data-ride="carousel">
-    <!-- Индикаторы -->
-    <div class="carousel-inner">
+    <div id="carousel" class="carousel slide" data-ride="carousel">
+        <!-- Индикаторы -->
+        <div class="carousel-inner">
 
-        <div class="item active">
-            <div class="jumbotron">
-                <h1>@Model.ElementAt(0).StepName</h1>
-                <hr />
-                <p>@Model.ElementAt(0).Text</p>
+            <div class="carousel-item active">
+                <div class="jumbotron">
+                    <h1>@Model.ElementAt(0).StepName</h1>
+                    <hr />
+                    <p>@Model.ElementAt(0).Text</p>
 
+                </div>
             </div>
-        </div>
 
-        @for (Int32 i = 1; i < Model.Count(); i++)
-        {
-        <div class="item">
-            <div class="jumbotron">
-                <h1> @Model.ElementAt(i).StepName</h1>
-                <hr />
-                <p>@Model.ElementAt(i).Text</p>
-            </div>
-        </div>
+            @for (Int32 i = 1; i < Model.Count(); i++)
+            {
+                <div class="carousel-item">
+                    <div class="jumbotron">
+                        <h1> @Model.ElementAt(i).StepName</h1>
+                        <hr />
+                        <p>@Model.ElementAt(i).Text</p>
+                    </div>
+                </div>
             }
+
+            <!-- Элементы управления -->
+            <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Предыдущий</span>
+            </a>
+            <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Следующий</span>
+            </a>
         </div>
-    <!-- Элементы управления -->
-    <a class="left carousel-control" href="#carousel" role="button" data-slide="prev">
-        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-        <span class="sr-only">Предыдущий</span>
-    </a>
-    <a class="right carousel-control" href="#carousel" role="button" data-slide="next">
-        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-        <span class="sr-only">Следующий</span>
-    </a>
-</div>
+    </div>
+}
+<hr />
+<p><a asp-controller="Home" asp-action="CreateFile">DownloadPDF</a></p>
+<hr />
+<div id="Comments"></div>
+<hr />
+@if (User.Identity.Name != null && (bool)ViewData["EmailConfirmed"])
+{
+
+    <div class="form-group">
+        <label class="control-label">Comment</label>
+        <input type="text" name="Text" id="Text" class="form-control" />
+    </div>
+    <input type="submit" id="add" value="Send" class="btn btn-default" />
+}
+else
+{
+    <h3>You need log in or confirm email to leave comments</h3>
 }
 <script type="text/javascript">
-    $('.carousel').carousel({
-        interval: false
-    })
-  </script>
+    $(function () {
+        $('#carousel').carousel({
+            interval: false,
+
+        });
+    });
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            url: '/Home/Comments',
+            type: 'POST',
+            cache: false,
+            async: true,
+            dataType: "html",
+        })
+            .done(function (result) {
+                $('#Comments').html(result);
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })
+    });
+</script>
+<script type="text/javascript">
+    $('#add').on('click', function (e) {
+        $.ajax({
+            url: '/Home/CreateComment',
+            type: 'POST',
+            cache: false,
+            async: true,
+            data: $('#Text').serialize(),
+            dataType: "html"
+        })
+            .done(function (result) {
+                $('#Comments').html(result);
+                $('#Text').val("");
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })
+    });
+
+</script>

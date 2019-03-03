@@ -10,16 +10,105 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Instructions.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190224160711_color")]
-    partial class color
+    [Migration("20190302103728_Comments3")]
+    partial class Comments3
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.8-servicing-32085")
+                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("Instructions.Models.Comment", b =>
+                {
+                    b.Property<int>("CommentID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("RecordID");
+
+                    b.Property<string>("Text");
+
+                    b.Property<string>("UserID");
+
+                    b.HasKey("CommentID");
+
+                    b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("Instructions.Models.Record", b =>
+                {
+                    b.Property<int>("RecordID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description")
+                        .IsRequired();
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.Property<string>("ThemeName");
+
+                    b.Property<string>("USerID");
+
+                    b.HasKey("RecordID");
+
+                    b.ToTable("Records");
+                });
+
+            modelBuilder.Entity("Instructions.Models.Step", b =>
+                {
+                    b.Property<int>("StepID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("RecordID1");
+
+                    b.Property<string>("StepName")
+                        .IsRequired();
+
+                    b.Property<string>("Text")
+                        .IsRequired();
+
+                    b.HasKey("StepID");
+
+                    b.HasIndex("RecordID1");
+
+                    b.ToTable("Steps");
+                });
+
+            modelBuilder.Entity("Instructions.Models.Tag", b =>
+                {
+                    b.Property<int>("TagID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("RecordID");
+
+                    b.Property<string>("TagName");
+
+                    b.HasKey("TagID");
+
+                    b.HasIndex("RecordID");
+
+                    b.ToTable("Tags");
+                });
+
+            modelBuilder.Entity("Instructions.Models.Theme", b =>
+                {
+                    b.Property<int>("ThemeID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Themes");
+
+                    b.HasKey("ThemeID");
+
+                    b.ToTable("Themes");
+                });
 
             modelBuilder.Entity("Instructions.Models.User", b =>
                 {
@@ -192,6 +281,20 @@ namespace Instructions.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("Instructions.Models.Step", b =>
+                {
+                    b.HasOne("Instructions.Models.Record", "RecordID")
+                        .WithMany()
+                        .HasForeignKey("RecordID1");
+                });
+
+            modelBuilder.Entity("Instructions.Models.Tag", b =>
+                {
+                    b.HasOne("Instructions.Models.Record", "Record")
+                        .WithMany()
+                        .HasForeignKey("RecordID");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
