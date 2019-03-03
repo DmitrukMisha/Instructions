@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace Instructions.Controllers
 {
@@ -20,8 +22,12 @@ namespace Instructions.Controllers
         {
             private readonly UserManager<User> _userManager;
             private ApplicationDbContext Recordcontext;
-            IConfiguration Configuration;
+            private readonly IConfiguration Configuration;
             static int id;
+            static string MainFileName;
+            static FileStream MainFile;
+            
+           
             
 
         public RecordsController(ApplicationDbContext context,UserManager<User> userManager, IConfiguration configuration)
@@ -94,17 +100,24 @@ namespace Instructions.Controllers
             {
                 User user =await _userManager.GetUserAsync(User);         
                 record.USerID = user.Id;
-                Recordcontext.Records.Add(record);
+                record.ImageLink=await CreateImageForRecord(record);                
+                Recordcontext.Records.Add(record);              
                 await Recordcontext.SaveChangesAsync();
                 await CreateSteps( StepName,Text, record);
                 if (Tags != null)           
                 await CreateTags(record, Tags);
                 return Redirect("/home");
             }
+
+        private async Task<string> CreateImageForRecord(Record record)
+        {
+            string link=await UploadFile(MainFile,MainFileName);
+            return link;        }
+        
         private CloudBlobContainer GetCloudBlobContainer(string RecordID)
         {
-                       CloudStorageAccount storageAccount =
-                CloudStorageAccount.Parse(Configuration["ConnectionStrings:AzureStorageConnectionString-1"]);
+            CloudStorageAccount storageAccount =
+            CloudStorageAccount.Parse(Configuration["ConnectionStrings:AzureStorageConnectionString-1"]);
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer container = blobClient.GetContainerReference(RecordID);
             return container;
@@ -112,14 +125,11 @@ namespace Instructions.Controllers
         [HttpPost]
         public async Task UploadFiles()
         {
-            var files = Request.Form.Files;
-            /*CloudBlobContainer container = GetCloudBlobContainer("images");
-            var result=container.CreateIfNotExistsAsync().Result;       
-            foreach (var file in files)
-            {
-                CloudBlockBlob blob = container.GetBlockBlobReference(file.Name);
-                await blob.UploadFromStreamAsync(file.OpenReadStream());
-            }*/
+            var MainPic = Request.Form.Files;
+            MainFileName = MainPic.ElementAt(0).FileName;
+            MainFile = new FileStream(Path.GetTempFileName(), FileMode.OpenOrCreate);
+            await MainPic.ElementAt(0).CopyToAsync(MainFile);
+            MainFile.Close();
         }
         [HttpPost]
         public async Task UploadFilesFromStep()
@@ -133,6 +143,24 @@ namespace Instructions.Controllers
                 await blob.UploadFromStreamAsync(file.OpenReadStream());
             }*/
             files.ToString();
+        }
+
+        [HttpPost]
+        public void GetData(string id,string filename)
+        {
+
+        }
+
+        public async Task<string> UploadFile(FileStream file, string fileName)
+        {
+            using (FileStream fileStream = new FileStream(file.Name, FileMode.Open))
+            {
+                CloudBlobContainer container = GetCloudBlobContainer("images");
+                var result = container.CreateIfNotExistsAsync().Result;
+                CloudBlockBlob blob = container.GetBlockBlobReference(DateTime.Now.ToString().Replace(" ", String.Empty) + fileName);
+                await blob.UploadFromStreamAsync(fileStream);
+                return blob.Uri.ToString();
+            }
         }
        
     }

@@ -12,16 +12,25 @@
         <div class="col-md-10">
             <h5>@ViewData["author" + item.RecordID.ToString()]</h5>
         </div>
-    <div class="col-md-2" align="right">
-        <p>
-            <font color="gray" size="2">@item.ThemeName</font>
-        </p>
+        <div class="col-md-2" align="right">
+            <p>
+                <font color="gray" size="2">@item.ThemeName</font>
+            </p>
+        </div>
     </div>
-   </div>
+    <hr />
+    <div color="gray">@item.Description</div>
+    <hr />
+    <center>
+        @if (item.ImageLink == null || item.ImageLink == String.Empty)
+        {<img src="~/images/no_photo.png" alt="no image" class="img-fluid center-block"/> }
+        else
+        {
+            <img src="@item.ImageLink" class="img-fluid center-block" />}
         <hr />
-        <div color="gray">@item.Description</div>
-        <hr />
-        <p><font color="gray" size="2">@ViewData[item.RecordID.ToString()] </font></p>
-    </div>
+    </center>
+ 
+    <p><font color="gray" size="2">@ViewData[item.RecordID.ToString()] </font></p>
+</div>
     }
 

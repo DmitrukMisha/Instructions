@@ -12,6 +12,10 @@ using Microsoft.Extensions.Localization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Syncfusion.Pdf;
+using Syncfusion.Pdf.Graphics;
+using Syncfusion.Drawing;
+using System.IO;
 
 namespace Instructions.Controllers
 {
@@ -30,12 +34,12 @@ namespace Instructions.Controllers
             DbContext = context;
             _localizer = localizer;
         }
-        
+
         public IActionResult Index()
         {
-            user = _userManager.GetUserAsync(User).Result;
-            ViewData["Role"] = user.RoleISAdmin;
+
             List<Record> records = DbContext.Records.ToList();
+            user = _userManager.GetUserAsync(User).Result;
             records.Reverse();
             GetTags(records);
             AuthorDataView(records);
@@ -43,6 +47,12 @@ namespace Instructions.Controllers
         }
         public IActionResult Record(string id)
         {
+            ViewData["EmailConfirmed"] = false;
+            if (user != null)
+            {
+                ViewData["EmailConfirmed"] = user.EmailConfirmed;
+            }
+            ViewData["RecordID"] = Convert.ToInt32(id);
             record = GetRecord(id);
             GetRecordData(id);
             return View(GetSteps(GetRecord(id)));
@@ -63,27 +73,27 @@ namespace Instructions.Controllers
         }
         public List<Step> GetSteps(Record record)
         {
-             return DbContext.Steps.Where(a => a.RecordID == record).ToList();
+            return DbContext.Steps.Where(a => a.RecordID == record).ToList();
         }
 
         public void GetTags(List<Record> records)
         {
             foreach (Record record in records)
             {
-                var tags = DbContext.Tags.Where(a => a.Record == record).Select(p=>p.TagName).ToList() ;
+                var tags = DbContext.Tags.Where(a => a.Record == record).Select(p => p.TagName).ToList();
                 var sb = new StringBuilder();
                 tags.ForEach(s => sb.Append(s));
                 var combinedList = sb.ToString();
                 ViewData[record.RecordID.ToString()] = combinedList;
             }
         }
-        
+
         public string GetAuthorName(Record record)
         {
             string Name = DbContext.Users.Where(a => a.Id == record.USerID).Select(p => p.UserName).SingleOrDefault();
             return Name;
         }
-        
+
         public void AuthorDataView(List<Record> records)
         {
             foreach (Record record in records)
@@ -94,9 +104,15 @@ namespace Instructions.Controllers
 
         public IActionResult Comments()
         {
-            ViewData["Role"] = user.RoleISAdmin;
-            List<Comment> comments= DbContext.Comments.Where(a => a.RecordID == record.RecordID).ToList();
-             ViewBag.Likes=GetLikes(comments);
+            List<Comment> comments = DbContext.Comments.Where(a => a.RecordID == record.RecordID).ToList();
+            ViewData["EmailConfirmed"] = false;
+            if (user != null)
+            {
+                ViewData["EmailConfirmed"] = user.EmailConfirmed;
+                ViewData["Role"] = user.RoleISAdmin;
+                ViewBag.Likes = GetLikes(comments);
+            }
+
             ViewBag.LikesCount = LikesCount(comments);
             return PartialView(comments);
         }
@@ -104,7 +120,7 @@ namespace Instructions.Controllers
         public List<bool> GetLikes(List<Comment> comments)
         {
             List<bool> LikesIsSet = new List<bool>();
-            foreach(Comment comment in comments)
+            foreach (Comment comment in comments)
             {
                 if (DbContext.Likes.Where(a => a.CommentID == comment && a.UserID == user).FirstOrDefault() == null)
                     LikesIsSet.Add(false);
@@ -118,17 +134,17 @@ namespace Instructions.Controllers
             List<int> LikesCount = new List<int>();
             foreach (Comment comment in comments)
             {
-               LikesCount.Add(DbContext.Likes.Where(a => a.CommentID == comment).Count());
-              
+                LikesCount.Add(DbContext.Likes.Where(a => a.CommentID == comment).Count());
+
             }
             return LikesCount;
         }
         [HttpPost]
         public async Task<IActionResult> CreateLike(int id)
         {
-            Comment comment = DbContext.Comments.Where(a => a.CommentID==id).FirstOrDefault();
+            Comment comment = DbContext.Comments.Where(a => a.CommentID == id).FirstOrDefault();
             User user = _userManager.GetUserAsync(User).Result;
-            Like like = new Like { CommentID = comment ,UserID=user};
+            Like like = new Like { CommentID = comment, UserID = user };
             await DbContext.Likes.AddAsync(like);
             await DbContext.SaveChangesAsync();
             return RedirectToAction("Comments");
@@ -150,8 +166,8 @@ namespace Instructions.Controllers
             {
                 Text = Text,
                 RecordID = record.RecordID,
-               
-        };
+
+            };
             User user = await _userManager.GetUserAsync(User);
             comment.UserID = user.Id;
             comment.UserName = user.UserName;
@@ -162,7 +178,7 @@ namespace Instructions.Controllers
         }
         public async Task<IActionResult> DeleteComment(int id)
         {
-            Comment comment=DbContext.Comments.Where(a=> a.CommentID ==id).FirstOrDefault();
+            Comment comment = DbContext.Comments.Where(a => a.CommentID == id).FirstOrDefault();
             DbContext.Remove(comment);
             await DbContext.SaveChangesAsync();
             return RedirectToAction("Comments");
@@ -170,10 +186,27 @@ namespace Instructions.Controllers
         public async Task<IActionResult> EditComment(int id, string Text)
         {
             Comment comment = DbContext.Comments.Where(a => a.CommentID == id).FirstOrDefault();
-            comment.Text = Text.Remove(0,12);
+            comment.Text = Text.Remove(0, 12);
             DbContext.Update(comment);
             await DbContext.SaveChangesAsync();
             return RedirectToAction("Comments");
+        }
+
+        public FileResult CreateFile()
+        {
+            PdfDocument document = new PdfDocument();
+            PdfPage page = document.Pages.Add();
+            PdfGraphics graphics = page.Graphics;   
+            PdfFont font = new PdfStandardFont(PdfFontFamily.Helvetica, 20);
+            //graphics.DrawString("Hello World!!!", font, PdfBrushes.Black, new PointF(0, 0));
+            graphics.DrawString(record.Name, font, PdfBrushes.Black, new PointF(0, 0));
+          //  graphics.DrawString(record.Description, font, PdfBrushes.Black, new PointF(0, 20));
+            MemoryStream stream = new MemoryStream();
+            document.Save(stream);
+            stream.Position = 0;
+            FileStreamResult fileStreamResult = new FileStreamResult(stream, "application/pdf");
+            fileStreamResult.FileDownloadName = record.Name.Replace(" ","_")+".pdf";
+            return fileStreamResult;
         }
         public async Task<IActionResult> Enter(string returnUrl)
         {

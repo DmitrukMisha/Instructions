@@ -52,13 +52,24 @@
         </div>
     </div>
 }
-    <div id="Comments"></div>  
-        <div class="form-group">
-            <label class="control-label">Comment</label>
-            <input type="text" name="Text" id="Text" class="form-control" />
-        </div>
-        <input type="submit" id="add" value="Send" class="btn btn-default" />
+<hr />
+<p><a asp-controller="Home" asp-action="CreateFile">DownloadPDF</a></p>
+<hr />
+<div id="Comments"></div>
+<hr />
+@if (User.Identity.Name != null && (bool)ViewData["EmailConfirmed"])
+{
 
+    <div class="form-group">
+        <label class="control-label">Comment</label>
+        <input type="text" name="Text" id="Text" class="form-control" />
+    </div>
+    <input type="submit" id="add" value="Send" class="btn btn-default" />
+}
+else
+{
+    <h3>You need log in or confirm email to leave comments</h3>
+}
 <script type="text/javascript">
     $(function () {
         $('#carousel').carousel({
@@ -76,11 +87,12 @@
             async: true,
             dataType: "html",
         })
-        .done(function (result) {
-            $('#Comments').html(result);
-        }).fail(function (xhr) {
-            console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
-        }) });
+            .done(function (result) {
+                $('#Comments').html(result);
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })
+    });
 </script>
 <script type="text/javascript">
     $('#add').on('click', function (e) {
@@ -95,8 +107,9 @@
             .done(function (result) {
                 $('#Comments').html(result);
                 $('#Text').val("");
-        }).fail(function (xhr) {
-            console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
-        })});
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })
+    });
 
 </script>
