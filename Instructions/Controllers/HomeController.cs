@@ -45,6 +45,12 @@ namespace Instructions.Controllers
             return View(GetSteps(GetRecord(id)));
         }
 
+        public IActionResult AddTheme()
+        {
+
+            return View(DbContext.Themes.ToList());
+        }
+
         public void GetRecordData(string id)
         {
             Record record = GetRecord(id);
@@ -282,7 +288,6 @@ namespace Instructions.Controllers
             }
             return Redirect("~/Identity/Account/Manage/AdminMenu");
         }
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

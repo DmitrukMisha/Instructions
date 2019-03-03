@@ -3,6 +3,7 @@
 @inject UserManager<User> UserManager
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
+
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
     var user = await UserManager.GetUserAsync(User);
@@ -54,8 +55,8 @@
                     <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link">@Localizer["Home"] <span class="sr-only"></span></a>
                 </li>
             </ul>
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="text" placeholder="@Localizer["Search"]" aria-label="@Localizer["Search"]">
+            <form asp-controller="Search" asp-action="Index" class="form-inline my-2 my-lg-0" method="post">
+                <input name="TextSearchInput" id="TextSearchInput" class="form-control mr-sm-2" type="text" placeholder="@Localizer["Search"]" aria-label="@Localizer["Search"]">
                 <button class="btn btn-success my-2 my-sm-0">@Localizer["Search"]</button>
             </form>
             <partial name="_LoginPartial" />
@@ -67,7 +68,7 @@
         </div>
 
     </nav>
-    
+
 
     <partial name="_CookieConsentPartial" />
 

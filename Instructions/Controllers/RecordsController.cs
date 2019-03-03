@@ -42,6 +42,7 @@ namespace Instructions.Controllers
             id = 0;
             return View();
             }
+
         [HttpPost]
         public IActionResult NewStep()
         {
@@ -49,9 +50,7 @@ namespace Instructions.Controllers
             ViewData["id"] = id;
            return PartialView();
         }
-
-
-       
+   
         public async Task CreateSteps(List<string> StepName, List<string> Text, Record record)
         {
             for(int i=0;i<StepName.Count;i++)
@@ -160,6 +159,41 @@ namespace Instructions.Controllers
             return Redirect("~/Identity/Account/Manage/PersonalInstructions");
         }
 
+
+        [HttpPost]
+        public async Task<ActionResult> CreateTheme(string theme_name)
+        {
+            Theme theme = new Theme
+            {
+                Themes = theme_name        
+            };
+               Recordcontext.Themes.Add(theme);
+
+            
+            await Recordcontext.SaveChangesAsync();
+            return Redirect("~/Home/AddTheme");
+        }
+
+       
+
+        [HttpPost]
+        public async Task<ActionResult> DeleteTheme(string[] selected)
+        {
+
+            if (selected != null)
+            {
+                foreach (var id in selected)
+                {
+                    Theme theme = await Recordcontext.Themes.FindAsync(Int32.Parse(id));
+                    if (theme != null)
+                    {
+                        Recordcontext.Themes.Remove(theme);
+                    }
+                }
+            }
+            await Recordcontext.SaveChangesAsync();
+            return Redirect("~/Home/AddTheme");
+        }
 
     }
     

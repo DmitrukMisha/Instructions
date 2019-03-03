@@ -39,7 +39,7 @@ namespace Instructions
             services.AddMvc()
                 .AddDataAnnotationsLocalization()
                 .AddViewLocalization();
-
+           
             services.Configure<RequestLocalizationOptions>(options =>
             {
                 var supportedCultures = new[]

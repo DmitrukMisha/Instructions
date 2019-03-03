@@ -7,7 +7,7 @@
 {
     <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" id="logoutForm" class="navbar-right">
         <ul class="navbar-nav right">
-            <li><a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage" class="nav-link">@Localizer["Hello,"] @UserManager.GetUserName(User)<span class="sr-only"></span>!</a></li>
+            <li><a asp-area="Identity" asp-page="/Account/Manage/Index" title="@Localizer["Manage"]" class="nav-link">@Localizer["Hello,"] @UserManager.GetUserName(User)<span class="sr-only"></span>!</a></li>
             <li><button type="submit" class="btn btn-outline-danger">@Localizer["Logout"]<span class="sr-only"></span></button></li>
         </ul>
     </form>
