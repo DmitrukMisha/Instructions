@@ -48,6 +48,7 @@ namespace Instructions.Controllers
             id = 0;
             return View();
             }
+
         [HttpPost]
         public IActionResult NewStep()
         {
@@ -55,9 +56,7 @@ namespace Instructions.Controllers
             ViewData["id"] = id;
            return PartialView();
         }
-
-
-       
+   
         public async Task CreateSteps(List<string> StepName, List<string> Text, Record record)
         {
             for(int i=0;i<StepName.Count;i++)
@@ -146,6 +145,46 @@ namespace Instructions.Controllers
         }
 
         [HttpPost]
+        public async Task<ActionResult> Delete(string[] selected)
+        {
+            if (selected != null)
+            {
+                foreach (var id in selected)
+                {
+                    var record = await Recordcontext.Records.FindAsync(Int32.Parse(id));
+                    
+                    
+                    if (record != null)
+                    {
+                        List<Step> steps = Recordcontext.Steps.Where(a => a.RecordID == record).ToList();
+                        foreach(var step in steps)
+                        {
+                            Recordcontext.Steps.Remove(step);
+                        }
+                        Recordcontext.Records.Remove(record);
+                        await Recordcontext.SaveChangesAsync();
+                    }
+                }
+            }
+            return Redirect("~/Identity/Account/Manage/PersonalInstructions");
+        }
+
+
+        [HttpPost]
+        public async Task<ActionResult> CreateTheme(string theme_name)
+        {
+            Theme theme = new Theme
+            {
+                Themes = theme_name        
+            };
+               Recordcontext.Themes.Add(theme);
+
+            
+            await Recordcontext.SaveChangesAsync();
+            return Redirect("~/Home/AddTheme");
+        }
+
+
         public void GetData(string id,string filename)
         {
 
@@ -162,7 +201,28 @@ namespace Instructions.Controllers
                 return blob.Uri.ToString();
             }
         }
+
        
+
+        [HttpPost]
+        public async Task<ActionResult> DeleteTheme(string[] selected)
+        {
+
+            if (selected != null)
+            {
+                foreach (var id in selected)
+                {
+                    Theme theme = await Recordcontext.Themes.FindAsync(Int32.Parse(id));
+                    if (theme != null)
+                    {
+                        Recordcontext.Themes.Remove(theme);
+                    }
+                }
+            }
+            await Recordcontext.SaveChangesAsync();
+            return Redirect("~/Home/AddTheme");
+        }
+
     }
     
 }

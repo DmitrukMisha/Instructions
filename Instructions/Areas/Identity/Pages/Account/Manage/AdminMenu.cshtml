@@ -12,6 +12,10 @@
     <table class="table">
         <tr>
             <th>
+                <input type="button" value="Themes" class="btn btn-sm btn-outline-success" onclick="window.location='@Url.Action("AddTheme", "Home")'" />
+            </th>
+
+            <th>
                 <button type="submit" asp-controller="Home" asp-action="Lock" class="btn btn-sm btn-warning"> Lock</button>
             </th>
             <th>
@@ -42,7 +46,7 @@
                 <th>
                     <input type="checkbox" name="selected" value="@user.Id" />
                 </th>
-                <td>@user.UserName</td>
+                <td><a asp-controller="Home" asp-route-id="@user.Id" asp-action="UserPage">@user.UserName<span class="sr-only"></span></a></td>
                 <td>@user.Email</td>
                 <td>
                     @if (user.Status)

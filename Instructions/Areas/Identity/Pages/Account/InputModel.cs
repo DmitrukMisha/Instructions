@@ -19,9 +19,6 @@ namespace Instructions.Areas.Identity.Pages.Account
 
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
-
-        [Phone]
-        [Display(Name = "Phone number")]
-        public string PhoneNumber { get; set; }
+        
     }
 }

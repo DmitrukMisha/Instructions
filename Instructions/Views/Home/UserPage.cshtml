@@ -1,0 +1,21 @@
+﻿@model IEnumerable<Instructions.Models.Record>
+@{
+    ViewData["Title"] = @ViewData["Name"]+ "'s page";
+}
+
+<h1 style="font-weight:bold">@ViewData["Name"]'s page</h1>
+<hr />
+@foreach (Record item in Model)
+{
+    <div class="jumbotron">
+        <p class="display-3" align="center"> <a asp-controller="Home" asp-action="Record" asp-route-id="@item.RecordID">@item.Name</a></p>
+        <div class="row">
+            <div class="col-md-3" align="left">
+                <p><font color="gray" size="2">Theme: @item.ThemeName</font></p>
+            </div>
+        </div>
+        <hr />
+        <div color="gray">@item.Description</div>
+    </div>
+}
+

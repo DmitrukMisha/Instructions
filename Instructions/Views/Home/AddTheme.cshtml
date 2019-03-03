@@ -1,0 +1,55 @@
+﻿@model IEnumerable<Instructions.Models.Theme>
+
+<h2>AddTheme</h2>
+
+
+    <form method="post" >
+        <table class="table">
+            <tr>
+                <th>
+                    <input  type="text" name="theme_name"  />
+                    <button type="submit" asp-controller="Records"  asp-action="CreateTheme" class="btn btn-sm btn-success"> Add theme</button>
+                </th>
+                @if (Model != null)
+                {
+                    <th>
+                        <button type="submit" asp-controller="Records"  asp-action="DeleteTheme" class="btn btn-sm btn-danger"> Delete</button>
+                    </th>
+                }
+            </tr>
+            @if (Model != null)
+            {
+                <tr>
+                    <th>
+                        <input type="checkbox" onClick="toggle(this)" /> Toggle All<br />
+                    </th>
+                    <th>
+                        Theme
+                    </th>
+                </tr>
+                @foreach (Theme item in Model)
+                {
+                    <tr>
+                        <th>
+                            <input type="checkbox" name="selected" value="@item.ThemeID" />
+                        </th>
+                        <td>@item.Themes</td>
+
+                    </tr>
+                }
+            }
+        </table>
+    </form>
+    @if (Model == null)
+    {
+
+        <p>No themes here</p>
+    }
+    <script language="JavaScript">
+        function toggle(source) {
+            checkboxes = document.getElementsByName('selected');
+            for (var i = 0, n = checkboxes.length; i < n; i++) {
+                checkboxes[i].checked = source.checked;
+            }
+        }
+    </script>

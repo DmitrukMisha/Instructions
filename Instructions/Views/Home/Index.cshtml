@@ -5,12 +5,12 @@
 }
 
 @foreach (Record item in Model)
-{
-<div class="jumbotron">
+{ 
+<div class="jumbotron" >
     <p class="display-3" align="center"> <a asp-controller="Home" asp-action="Record" asp-route-id="@item.RecordID">@item.Name</a></p>
     <div class="row">
         <div class="col-md-10">
-            <h5>@ViewData["author" + item.RecordID.ToString()]</h5>
+            <h5><a asp-controller="Home" asp-route-id="@item.USerID" asp-action="UserPage">@ViewData["author" + item.RecordID.ToString()]<span class="sr-only"></span></a> </h5>
         </div>
         <div class="col-md-2" align="right">
             <p>
