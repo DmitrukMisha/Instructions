@@ -1,19 +1,25 @@
 ﻿@model IEnumerable<Instructions.Models.Step>
+@using Microsoft.AspNetCore.Identity
 @{
     ViewData["Title"] = @ViewData["Name"];
 }
 
-<h1>@ViewData["Name"]</h1>
+<h1>@ViewData["Name"] 
+    @if (User.Identity.Name != null && (User.Identity.Name == ViewData["Author"].ToString() || (bool)ViewData["Role"]))
+    {  <a asp-controller="Records" style="font-size:20px" asp-action="RecordEdit" asp-route-RecordId="@ViewData["RecordID"]">Edit</a>}
+    </h1>
 <hr />
 <div class="row">
     <div class="col-md-10">
+
         <h5>User:@ViewData["Author"]</h5>
     </div>
-    <div class="col-md-2" align="right">
+    <div class="col-md-2">
         <h5>Theme: @ViewData["Theme"]</h5>
     </div>
 </div>
 <hr />
+
 @if (Model.Count() != 0)
 {
     <div id="carousel" class="carousel slide" data-ride="carousel">

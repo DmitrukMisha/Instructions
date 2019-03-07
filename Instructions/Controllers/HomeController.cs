@@ -27,6 +27,8 @@ namespace Instructions.Controllers
         private readonly IStringLocalizer<HomeController> _localizer;
         static User user;
         static Record record;
+        const int CountCloudTags = 10;
+
         public HomeController(IStringLocalizer<HomeController> localizer, UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context)
         {
             _userManager = userManager;
@@ -37,7 +39,7 @@ namespace Instructions.Controllers
 
         public IActionResult Index()
         {
-
+            ViewBag.TagsNames = GenerateTagsCloudValues();
             List<Record> records = DbContext.Records.ToList();
             user = _userManager.GetUserAsync(User).Result;
             records.Reverse();
@@ -45,15 +47,38 @@ namespace Instructions.Controllers
             AuthorDataView(records);
             return View(records);
         }
-
+        public List<string> GenerateTagsCloudValues()
+        {
+            List<string> TagsCloudValues = new List<string>();
+            IEnumerable<string> Tags = DbContext.Tags.Select(t => t.TagName).ToList().Distinct();
+            Random random = new Random();
+            int RandomValue;
+            int count;
+            if (Tags.Count() < CountCloudTags)
+            {
+             count = Tags.Count();
+            } else { count = CountCloudTags; }
+                for (int i = 0; i < count; i++)
+                {
+                    RandomValue = random.Next(Tags.Count());
+                         if (!TagsCloudValues.Contains(Tags.ElementAt(RandomValue)))
+                            {
+                                 TagsCloudValues.Add(Tags.ElementAt(RandomValue));
+                            }
+                          else { count++; }
+            }
+            return TagsCloudValues;
+        }
         public IActionResult Record(string id)
         {
             ViewData["EmailConfirmed"] = false;
             if (user != null)
             {
                 ViewData["EmailConfirmed"] = user.EmailConfirmed;
+                ViewData["Role"] = user.RoleISAdmin;
             }
             ViewData["RecordID"] = Convert.ToInt32(id);
+            
             record = GetRecord(id);
             GetRecordData(id);
             return View(GetSteps(GetRecord(id)));
@@ -185,6 +210,68 @@ namespace Instructions.Controllers
             await DbContext.SaveChangesAsync();
             return RedirectToAction("Comments");
         }
+
+        public async void DeleteLikes(Comment comment)
+        {
+            List<Like> likes = DbContext.Likes.Where(a => a.CommentID == comment).ToList();
+            foreach(Like like in likes)
+            {
+                DbContext.Likes.Remove(like);
+            }
+            await DbContext.SaveChangesAsync();
+        }
+
+         public async void DeleteComments(Record record)
+        {
+            List<Comment> comments = DbContext.Comments.Where(a => a.RecordID == record.RecordID).ToList();
+            foreach(Comment comment in comments)
+            {
+                DeleteLikes(comment);
+                DbContext.Comments.Remove(comment);
+            }
+            
+            await DbContext.SaveChangesAsync();
+        }
+
+        public async void DeleteTags(Record record)
+        {
+            List<Tag> tags = DbContext.Tags.Where(a => a.Record == record).ToList();
+            foreach (Tag tag in tags)
+            {
+                DbContext.Tags.Remove(tag);
+            }
+
+            await DbContext.SaveChangesAsync();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> DeleteRecords(string[] selected)
+        {
+            if (selected != null)
+            {
+                foreach (var id in selected)
+                {
+                    var record = await DbContext.Records.FindAsync(Int32.Parse(id));
+
+
+                    if (record != null)
+                    {
+                        List<Step> steps = DbContext.Steps.Where(a => a.RecordID == record).ToList();
+                        foreach (var step in steps)
+                        {
+                            DbContext.Steps.Remove(step);
+                        }
+                        DeleteComments(record);
+                        DeleteTags(record);
+                        DbContext.Records.Remove(record);
+                        await DbContext.SaveChangesAsync();
+                        
+                    }
+                }
+            }
+            return Redirect("~/Identity/Account/Manage/PersonalInstructions");
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateComment(string Text)
         {
@@ -202,11 +289,13 @@ namespace Instructions.Controllers
             return RedirectToAction("Comments");
 
         }
+        [HttpPost]
         public async Task<IActionResult> DeleteComment(int id)
         {
             Comment comment = DbContext.Comments.Where(a => a.CommentID == id).FirstOrDefault();
-            DbContext.Remove(comment);
-            await DbContext.SaveChangesAsync();
+            DeleteLikes(comment);
+            DbContext.Comments.Remove(comment);
+             await DbContext.SaveChangesAsync();
             return RedirectToAction("Comments");
         }
         public async Task<IActionResult> EditComment(int id, string Text)
