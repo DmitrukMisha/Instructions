@@ -1,7 +1,38 @@
-﻿@model IEnumerable<Instructions.Models.Record>
-
-@{
+﻿@{
     ViewData["Title"] = "Index";
 }
 
-@Html.Partial("RecordsView")
+<div id="Records"></div>
+<input type="button" id="AddMore" class="btn btn-default" value="Get more records" />
+
+<script type="text/javascript">
+    $('#AddMore').on('click', function (e) {
+        $.ajax({
+            url: '/Home/RecordsView',
+            type: 'POST',
+            cache: false,
+            async: true,
+            dataType: "html",
+        })
+            .done(function (result) {
+                $('#Records').append(result);
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })
+    });
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            url: '/Home/RecordsView',
+            type: 'POST',
+            cache: false,
+            async: true,
+            dataType: "html",
+        })
+        .done(function (result) {
+            $('#Records').append(result);
+        }).fail(function (xhr) {
+            console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+        }) });
+</script>

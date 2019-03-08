@@ -111,10 +111,13 @@ namespace Instructions.Controllers
             while (index<filePaths.Count&&filePaths.ElementAt(index).id == idnew) 
             {
                 string link=await UploadFile(filePaths.ElementAt(index).path, filePaths.ElementAt(index).filename);
-                Image image = new Image { StepID = step, Link = link };
-                Recordcontext.Images.Add(image);
-                await Recordcontext.SaveChangesAsync();
-                index++;
+                    if (link != null)
+                    {
+                        Image image = new Image { StepID = step, Link = link };
+                        Recordcontext.Images.Add(image);                   
+                         await Recordcontext.SaveChangesAsync();
+                    }
+                    index++;
             }
             idnew++;
             return idnew;
@@ -125,6 +128,7 @@ namespace Instructions.Controllers
         {
     
             Tags=Tags.Replace(",", String.Empty);
+            Tags = Tags.Replace(" ", String.Empty);
             List<string> TagsList = Tags.Split("#").ToList();
             foreach(string Tag in TagsList)
             {
@@ -254,13 +258,20 @@ namespace Instructions.Controllers
 
         public async Task<string> UploadFile(string file, string fileName)
         {
-            using (FileStream fileStream = new FileStream(file, FileMode.Open))
+            try
             {
-                CloudBlobContainer container = GetCloudBlobContainer("images");
-                var result = container.CreateIfNotExistsAsync().Result;
-                CloudBlockBlob blob = container.GetBlockBlobReference(DateTime.Now.ToString().Replace(" ", String.Empty) + fileName);
-                await blob.UploadFromStreamAsync(fileStream);
-                return blob.Uri.ToString();
+                using (FileStream fileStream = new FileStream(file, FileMode.Open))
+                {
+                    CloudBlobContainer container = GetCloudBlobContainer("images");
+                    var result = container.CreateIfNotExistsAsync().Result;
+                    CloudBlockBlob blob = container.GetBlockBlobReference(DateTime.Now.ToString().Replace(" ", String.Empty) + fileName);
+                    await blob.UploadFromStreamAsync(fileStream);
+                    return blob.Uri.ToString();
+                }
+            }
+            catch (Exception e)
+            {
+                return null;
             }
         }
 

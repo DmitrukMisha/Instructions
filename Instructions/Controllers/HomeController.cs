@@ -27,7 +27,7 @@ namespace Instructions.Controllers
         private readonly IStringLocalizer<HomeController> _localizer;
         static User user;
         static Record record;
-        static int count=0;
+        static int count=0,taken=10;
         public HomeController(IStringLocalizer<HomeController> localizer, UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context)
         {
             _userManager = userManager;
@@ -37,22 +37,20 @@ namespace Instructions.Controllers
         }
 
         public IActionResult Index()
-        {
-
-            //List<Record> records = DbContext.Records.ToList();
+        {         
+            count= DbContext.Records.Count();
+            taken = 10;
             user = _userManager.GetUserAsync(User).Result;
-            //records.Reverse();
-          //  GetTags(records);
-          //  AuthorDataView(records);
             return View();
         }
-
+        [HttpPost]
         public IActionResult RecordsView()
         {
-            count += 20;
-            List<Record> records = DbContext.Records.Reverse().Take(count).ToList();
-           // user = _userManager.GetUserAsync(User).Result;
-           // records.Reverse();
+            if (count < 10)
+                taken = count;
+            count -= taken;
+            List<Record> records = DbContext.Records.ToList().GetRange(count,taken);             
+            records.Reverse();
             GetTags(records);
             AuthorDataView(records);
             return PartialView(records);
