@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Instructions.Models;
 using Instructions.Data;
-
 using System.Text;
 using Microsoft.Extensions.Localization;
 using Microsoft.AspNetCore.Localization;

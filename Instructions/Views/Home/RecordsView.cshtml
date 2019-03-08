@@ -19,7 +19,7 @@
             </div>
         </div>
         <hr />
-        <div color="gray">@item.Description</div>
+        <div color="gray">@Westwind.AspNetCore.Markdown.Markdown.ParseHtmlString(item.Description)</div>
         <hr />
         <center>
             @if (item.ImageLink == null || item.ImageLink == String.Empty)

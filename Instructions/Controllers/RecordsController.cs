@@ -15,7 +15,6 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
 using System.IO;
-
 namespace Instructions.Controllers
 {
     public class RecordsController : Controller
@@ -269,7 +268,7 @@ namespace Instructions.Controllers
                     return blob.Uri.ToString();
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }

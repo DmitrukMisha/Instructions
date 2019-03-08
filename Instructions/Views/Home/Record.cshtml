@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<Instructions.Models.Step>
 @using System.Collections.Generic
-
+@using Westwind.AspNetCore.Markdown
 @{
     ViewData["Title"] = @ViewData["Name"];
 }
@@ -27,7 +27,9 @@
                 <div class="jumbotron">
                     <h1>@Model.ElementAt(0).StepName</h1>
                     <hr />
-                    <p>@Model.ElementAt(0).Text</p>
+
+                   
+                        <div>@Markdown.ParseHtmlString(Model.ElementAt(0).Text)</div>
 
                     <div class="row justify-content-center">
                         @if (ViewBag.images != null)
@@ -38,49 +40,49 @@
                             {
                                 foreach (Image image in imagesForStep)
                                 {
-                        <center>
-                            <a href="@image.Link" class="image col-md-2">
-                                <img src="@image.Link" width="200" />
-                            </a>
-                        </center>
+                                    <center>
+                                        <a href="@image.Link" class="image col-md-2">
+                                            <img src="@image.Link" width="200" />
+                                        </a>
+                                    </center>
                                 }
 
-                            }
-                        }
-                    </div>
-                </div>
-          </div>
-            @for (Int32 i = 1; i < Model.Count(); i++)
-            {
-            <div class="carousel-item">
-
-                <div class="jumbotron">
-                    <h1> @Model.ElementAt(i).StepName</h1>
-                    <hr />
-                    <p>@Model.ElementAt(i).Text</p>
-
-
-                    <div class="row justify-content-center">
-                        @if (ViewBag.images != null)
-                        {
-                            List<Image> images = ViewBag.images;
-                            List<Image> imagesForStep = images.FindAll(a => a.StepID == Model.ElementAt(i));
-                            if (imagesForStep != null)
-                            {
-                                foreach (Image image in imagesForStep)
-                                {
-                        <center>
-                            <a href="@image.Link" class="image col-md-3">
-                                <img src="@image.Link" width="200" />
-                            </a>
-                        </center>
-
-                                }
                             }
                         }
                     </div>
                 </div>
             </div>
+            @for (Int32 i = 1; i < Model.Count(); i++)
+            {
+                <div class="carousel-item">
+
+                    <div class="jumbotron">
+                        <h1> @Model.ElementAt(i).StepName</h1>
+                        <hr />
+                        <p>@Model.ElementAt(i).Text</p>
+
+
+                        <div class="row justify-content-center">
+                            @if (ViewBag.images != null)
+                            {
+                                List<Image> images = ViewBag.images;
+                                List<Image> imagesForStep = images.FindAll(a => a.StepID == Model.ElementAt(i));
+                                if (imagesForStep != null)
+                                {
+                                    foreach (Image image in imagesForStep)
+                                    {
+                                        <center>
+                                            <a href="@image.Link" class="image col-md-3">
+                                                <img src="@image.Link" width="200" />
+                                            </a>
+                                        </center>
+
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
             }
 
             <!-- Элементы управления -->
@@ -122,19 +124,6 @@ else
     });
 </script>
 <script type="text/javascript">
-   // var check = function() {
-     /*   $.ajax({
-            url: '/Home/CommentsUpdate',
-            type: 'POST',
-            cache: false,
-            async: true,
-            dataType: "json",
-        })
-            .done(function (result) {
-                alert(result);
-            }).fail(function (xhr) {
-                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
-            })};*/
     $(document).ready(function () {
         $.ajax({
             url: '/Home/Comments',
@@ -148,27 +137,10 @@ else
             }).fail(function (xhr) {
                 console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
             })
-      //  setInterval(check, 20000)
     });
 
 </script>
 
-<script type="text/javascript">
-   /* $(document).ready(setInterval(/*function () {
-        $.ajax({
-            url: '/Home/CommentsUpdate',
-            type: 'POST',
-            cache: false,
-            async: true,
-            dataType: "json",
-        })
-            .done(function (result) {
-                if (result == true) alert("true");
-            }).fail(function (xhr) {
-                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
-            })
-    })*///alert("zhopa"), 1000));
-</script>
 
 <script type="text/javascript">
     $('#add').on('click', function (e) {
@@ -191,4 +163,4 @@ else
 </script>
 <script type="text/javascript">
     $(document).ready(function () { $(".image").fancybox(); });
-    </script>
+</script>
