@@ -11,11 +11,12 @@ using Microsoft.Extensions.Localization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Syncfusion.Pdf;
-using Syncfusion.Pdf.Graphics;
-using Syncfusion.Drawing;
+//using Syncfusion.Pdf;
+//using Syncfusion.Pdf.Graphics;
+//using Syncfusion.Drawing;
 using System.IO;
-
+using IronPdf;
+using HtmlAgilityPack;
 namespace Instructions.Controllers
 {
     public class HomeController : Controller
@@ -246,23 +247,30 @@ namespace Instructions.Controllers
             return RedirectToAction("Comments");
         }
 
-        public FileResult CreateFile()
+        public FileResult CreateFile(string path)
         {
-            PdfDocument document = new PdfDocument();
-            PdfPage page = document.Pages.Add();
-            PdfGraphics graphics = page.Graphics;   
-            PdfFont font = new PdfStandardFont(PdfFontFamily.Helvetica, 20);
-            //graphics.DrawString("Hello World!!!", font, PdfBrushes.Black, new PointF(0, 0));
-            graphics.DrawString(record.Name, font, PdfBrushes.Black, new PointF(0, 0));
-          //  graphics.DrawString(record.Description, font, PdfBrushes.Black, new PointF(0, 20));
-            MemoryStream stream = new MemoryStream();
-            document.Save(stream);
+            HtmlWeb htmlWeb = new HtmlWeb
+            {
+                AutoDetectEncoding = false,
+                OverrideEncoding = Encoding.UTF8
+            };
+            string[] elements=new string[3] { "//nav[contains(@class, 'navbar')]" , "//div[contains(@id, 'content')]", "//a[contains(@href, '#carousel')]" }
+            var docNode = htmlWeb.Load(path).DocumentNode;
+            foreach (string s in elements)
+            {
+                var removedNav = docNode.SelectNodes(s);
+                foreach (var content in removedNav)
+                    content.Remove();
+            }
+            HtmlToPdf renderer = new HtmlToPdf();
+            MemoryStream stream = renderer.RenderHtmlAsPdf(docNode.OuterHtml).Stream;
             stream.Position = 0;
             FileStreamResult fileStreamResult = new FileStreamResult(stream, "application/pdf")
             {
                 FileDownloadName = record.Name.Replace(" ", "_") + ".pdf"
             };
             return fileStreamResult;
+            
         }
         public async Task<IActionResult> Enter(string returnUrl)
         {

@@ -98,69 +98,71 @@
     </div>
 }
 <hr />
-<p><a asp-controller="Home" asp-action="CreateFile">DownloadPDF</a></p>
-<hr />
-<div id="Comments"></div>
-<hr />
-@if (User.Identity.Name != null && (bool)ViewData["EmailConfirmed"])
-{
+<div id="content">
+    <p><a asp-controller="Home" asp-action="CreateFile" asp-route-path="@string.Format("{0}://{1}{2}{3}", Context.Request.Scheme, Context.Request.Host, Context.Request.Path, Context.Request.QueryString)">DownloadPDF</a></p>
+    <hr />
+    <div id="Comments"></div>
+    <hr />
+    @if (User.Identity.Name != null && (bool)ViewData["EmailConfirmed"])
+    {
 
-    <div class="form-group">
-        <label class="control-label">Comment</label>
-        <input type="text" name="Text" id="Text" class="form-control" />
+        <div class="form-group">
+            <label class="control-label">Comment</label>
+            <input type="text" name="Text" id="Text" class="form-control" />
+        </div>
+        <input type="submit" id="add" value="Send" class="btn btn-default" />
+    }
+    else
+    {
+        <h3>You need log in or confirm email to leave comments</h3>
+    }
     </div>
-    <input type="submit" id="add" value="Send" class="btn btn-default" />
-}
-else
-{
-    <h3>You need log in or confirm email to leave comments</h3>
-}
-<script type="text/javascript">
-    $(function () {
-        $('#carousel').carousel({
-            interval: false
+    <script type="text/javascript">
+        $(function () {
+            $('#carousel').carousel({
+                interval: false
 
+            });
         });
-    });
-</script>
-<script type="text/javascript">
-    $(document).ready(function () {
-        $.ajax({
-            url: '/Home/Comments',
-            type: 'POST',
-            cache: false,
-            async: true,
-            dataType: "html",
-        })
-            .done(function (result) {
-                $('#Comments').html(result);
-            }).fail(function (xhr) {
-                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.ajax({
+                url: '/Home/Comments',
+                type: 'POST',
+                cache: false,
+                async: true,
+                dataType: "html",
             })
-    });
+                .done(function (result) {
+                    $('#Comments').html(result);
+                }).fail(function (xhr) {
+                    console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+                })
+        });
 
-</script>
+    </script>
 
 
-<script type="text/javascript">
-    $('#add').on('click', function (e) {
-        $.ajax({
-            url: '/Home/CreateComment',
-            type: 'POST',
-            cache: false,
-            async: true,
-            data: $('#Text').serialize(),
-            dataType: "html"
-        })
-            .done(function (result) {
-                $('#Comments').html(result);
-                $('#Text').val("");
-            }).fail(function (xhr) {
-                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+    <script type="text/javascript">
+        $('#add').on('click', function (e) {
+            $.ajax({
+                url: '/Home/CreateComment',
+                type: 'POST',
+                cache: false,
+                async: true,
+                data: $('#Text').serialize(),
+                dataType: "html"
             })
-    });
+                .done(function (result) {
+                    $('#Comments').html(result);
+                    $('#Text').val("");
+                }).fail(function (xhr) {
+                    console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+                })
+        });
 
-</script>
-<script type="text/javascript">
-    $(document).ready(function () { $(".image").fancybox(); });
-</script>
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () { $(".image").fancybox(); });
+    </script>
