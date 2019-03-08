@@ -21,11 +21,13 @@ namespace Instructions.Controllers
     public class RecordsController : Controller
         {
             private readonly UserManager<User> _userManager;
+            static List<FilePath> filePaths;
             private ApplicationDbContext Recordcontext;
             private readonly IConfiguration Configuration;
             static int id;
             static string MainFileName;
             static FileStream MainFile;
+             static List<int> activeSteps;
             
            
             
@@ -42,10 +44,15 @@ namespace Instructions.Controllers
           
             public IActionResult Index()
             {
+          if (User.Identity.Name == null)
+                return Redirect("~/Identity/Account/Login");
            var tags = Recordcontext.Tags.Select(t => t.TagName).ToList().Distinct();
             ViewBag.Tags =new HtmlString(JsonConvert.SerializeObject(tags,Formatting.None)) ;
             ViewBag.Themes= Recordcontext.Themes.ToList();
+            activeSteps = new List<int>();
+            filePaths = new List<FilePath>();
             id = 0;
+            MainFile = null;
             return View();
             }
 
@@ -53,12 +60,23 @@ namespace Instructions.Controllers
         public IActionResult NewStep()
         {
             id++;
+            activeSteps.Add(id);
             ViewData["id"] = id;
            return PartialView();
         }
-   
+        
+        [HttpPost]
+        public void RemoveStepIdFromList(int id)
+        {
+            activeSteps.Remove(id);
+        }
+
         public async Task CreateSteps(List<string> StepName, List<string> Text, Record record)
         {
+            List<FilePath> filePathsSorted=new List<FilePath>();
+            if (filePaths!=null)
+            filePathsSorted = (from filepath in filePaths orderby filepath.id select filepath).ToList();
+            int index=1;
             for(int i=0;i<StepName.Count;i++)
             {
                 Step step = new Step
@@ -68,10 +86,41 @@ namespace Instructions.Controllers
                     RecordID = record
                 };
                 await Recordcontext.Steps.AddAsync(step);
-                
+                await Recordcontext.SaveChangesAsync();
+                if (index!=-1&&filePathsSorted.Count!=0)
+                index =await CreateImagesForStep(filePathsSorted, step, index);
             }
-            await Recordcontext.SaveChangesAsync();
+           
         }
+
+        public async Task<int> CreateImagesForStep(List<FilePath> filePaths, Step step, int id)
+        {
+            int idnew = id;
+            int index;
+            int maxId = filePaths.Max(a => a.id);
+            if (!activeSteps.Contains(idnew))
+                do
+                {
+                    index = filePaths.FindIndex(x => x.id == idnew);
+                    if (index == -1) idnew++;
+                }
+                while (index == -1 && idnew <= maxId&&!activeSteps.Contains(idnew));
+            else { index = filePaths.FindIndex(x => x.id == idnew); }
+            if (idnew > maxId) return -1;
+            if (!(index==-1)) 
+            while (index<filePaths.Count&&filePaths.ElementAt(index).id == idnew) 
+            {
+                string link=await UploadFile(filePaths.ElementAt(index).path, filePaths.ElementAt(index).filename);
+                Image image = new Image { StepID = step, Link = link };
+                Recordcontext.Images.Add(image);
+                await Recordcontext.SaveChangesAsync();
+                index++;
+            }
+            idnew++;
+            return idnew;
+            
+        }
+
         public async Task CreateTags(Record record , string Tags)
         {
     
@@ -99,6 +148,7 @@ namespace Instructions.Controllers
             {
                 User user =await _userManager.GetUserAsync(User);         
                 record.USerID = user.Id;
+                if (MainFile!=null)
                 record.ImageLink=await CreateImageForRecord(record);                
                 Recordcontext.Records.Add(record);              
                 await Recordcontext.SaveChangesAsync();
@@ -110,7 +160,7 @@ namespace Instructions.Controllers
 
         private async Task<string> CreateImageForRecord(Record record)
         {
-            string link=await UploadFile(MainFile,MainFileName);
+            string link=await UploadFile(MainFile.Name,MainFileName);
             return link;        }
         
         private CloudBlobContainer GetCloudBlobContainer(string RecordID)
@@ -134,15 +184,22 @@ namespace Instructions.Controllers
         public async Task UploadFilesFromStep()
         {
             var files = Request.Form.Files;
-            /*CloudBlobContainer container = GetCloudBlobContainer("images");
-            var result=container.CreateIfNotExistsAsync().Result;       
-            foreach (var file in files)
-            {
-                CloudBlockBlob blob = container.GetBlockBlobReference(file.Name);
-                await blob.UploadFromStreamAsync(file.OpenReadStream());
-            }*/
-            files.ToString();
+            string path = Path.GetTempFileName();  
+            using (FileStream fs = new FileStream(path, FileMode.Create))
+                {
+                await files.ElementAt(0).CopyToAsync(fs);
+                fs.Close();
+                }
+            filePaths.Last().path = path;
+            
         }
+        [HttpPost]
+        public void RemoveFileFromStep(string id,string filename)
+        {
+            int index = filePaths.FindIndex(a => a.id == int.Parse(id) && a.filename == filename);
+            filePaths.RemoveAt(index);
+        }
+
 
         [HttpPost]
         public async Task<ActionResult> Delete(string[] selected)
@@ -187,12 +244,17 @@ namespace Instructions.Controllers
 
         public void GetData(string id,string filename)
         {
-
+            FilePath filePath = new FilePath
+            {
+                id = int.Parse(id),
+                filename = filename
+            };
+            filePaths.Add(filePath);
         }
 
-        public async Task<string> UploadFile(FileStream file, string fileName)
+        public async Task<string> UploadFile(string file, string fileName)
         {
-            using (FileStream fileStream = new FileStream(file.Name, FileMode.Open))
+            using (FileStream fileStream = new FileStream(file, FileMode.Open))
             {
                 CloudBlobContainer container = GetCloudBlobContainer("images");
                 var result = container.CreateIfNotExistsAsync().Result;

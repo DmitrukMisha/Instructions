@@ -5,38 +5,38 @@
 
 @for (Int32 i = 0; i < Model.Count(); i++)
 {
-    <div class="card border-primary mb-1" >
-        <div class="card-header">@Model.ElementAt(i).UserName</div>
-        <div class="card-body">
-            <p class="card-text">@Model.ElementAt(i).Text</p>
-        </div>
-        <div class="container">
-            <div class="row">
-                <div class="col align-self-end">
-                    @if (User.Identity.Name == null || !(bool)ViewData["EmailConfirmed"])
-                    {
+<div class="card border-primary mb-1">
+    <div class="card-header">@Model.ElementAt(i).UserName</div>
+    <div class="card-body">
+        <p class="card-text">@Model.ElementAt(i).Text</p>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col align-self-end">
+                @if (User.Identity.Name == null || !(bool)ViewData["EmailConfirmed"])
+                {
                     <button type="button" class="btn btn-outline-secondary " style="max-width: 3rem;" commid="@Model.ElementAt(i).CommentID">❤</button>
-                    }
-                    else
-                    {
+                }
+                else
+                {
                     @if (ViewBag.Likes[i])
                     {<button type="button" class="btn btn-success " style="max-width: 3rem;" commid="@Model.ElementAt(i).CommentID">❤</button>
                     }
                     else
                     { <button type="button" class="btn btn-outline-success" style="max-width: 3rem;" commid="@Model.ElementAt(i).CommentID">❤</button>}}
-                    @ViewBag.LikesCount[i]
-                </div>
+                @ViewBag.LikesCount[i]
             </div>
         </div>
-        @if (User.Identity.Name!=null&&(User.Identity.Name == Model.ElementAt(i).UserName || (bool)ViewData["Role"]))
-        {
-            <hr />
-            <div class="btn-group" role="group" aria-label="Basic example">
-                <input type="submit" id="delete" commid="@Model.ElementAt(i).CommentID" name="id" value="Delete" class="btn btn-outline-danger " />
-                <input type="submit" id="edit" commid="@Model.ElementAt(i).CommentID" name="id" value="Edit" class="btn btn-outline-info" />
-            </div>
-        }
     </div>
+    @if (User.Identity.Name != null && (User.Identity.Name == Model.ElementAt(i).UserName || (bool)ViewData["Role"]))
+    {
+        <hr />
+        <div class="btn-group" role="group" aria-label="Basic example">
+            <input type="submit" id="delete" commid="@Model.ElementAt(i).CommentID" name="id" value="Delete" class="btn btn-outline-danger " />
+            <input type="submit" id="edit" commid="@Model.ElementAt(i).CommentID" name="id" value="Edit" class="btn btn-outline-info" />
+        </div>
+    }
+</div>
 }
 <script type="text/javascript">
     $('.btn-outline-danger').on('click', function (e) {

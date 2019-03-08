@@ -27,6 +27,7 @@ namespace Instructions.Controllers
         private readonly IStringLocalizer<HomeController> _localizer;
         static User user;
         static Record record;
+        static int count=0;
         public HomeController(IStringLocalizer<HomeController> localizer, UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context)
         {
             _userManager = userManager;
@@ -38,12 +39,23 @@ namespace Instructions.Controllers
         public IActionResult Index()
         {
 
-            List<Record> records = DbContext.Records.ToList();
+            //List<Record> records = DbContext.Records.ToList();
             user = _userManager.GetUserAsync(User).Result;
-            records.Reverse();
+            //records.Reverse();
+          //  GetTags(records);
+          //  AuthorDataView(records);
+            return View();
+        }
+
+        public IActionResult RecordsView()
+        {
+            count += 20;
+            List<Record> records = DbContext.Records.Reverse().Take(count).ToList();
+           // user = _userManager.GetUserAsync(User).Result;
+           // records.Reverse();
             GetTags(records);
             AuthorDataView(records);
-            return View(records);
+            return PartialView(records);
         }
 
         public IActionResult Record(string id)
@@ -56,7 +68,9 @@ namespace Instructions.Controllers
             ViewData["RecordID"] = Convert.ToInt32(id);
             record = GetRecord(id);
             GetRecordData(id);
-            return View(GetSteps(GetRecord(id)));
+            var steps = GetSteps(record);
+            ViewBag.images=GetImages(steps);
+            return View(steps);
         }
 
 
@@ -96,7 +110,18 @@ namespace Instructions.Controllers
         {
             return DbContext.Steps.Where(a => a.RecordID == record).ToList();
         }
-
+        
+        public List<Models.Image> GetImages(List<Step> steps)
+        {
+            List<Models.Image> images = new List<Models.Image>();
+            foreach(Step step in steps)
+            {
+                List<Models.Image> imagesFromStep = DbContext.Images.Where(a => a.StepID == step).ToList();
+                images.AddRange(imagesFromStep);
+            }
+            return images;
+        }
+        
         public List<Record> GetRecords(User user)
         {
             return DbContext.Records.Where(a => a.USerID == user.Id).ToList();
@@ -230,8 +255,10 @@ namespace Instructions.Controllers
             MemoryStream stream = new MemoryStream();
             document.Save(stream);
             stream.Position = 0;
-            FileStreamResult fileStreamResult = new FileStreamResult(stream, "application/pdf");
-            fileStreamResult.FileDownloadName = record.Name.Replace(" ","_")+".pdf";
+            FileStreamResult fileStreamResult = new FileStreamResult(stream, "application/pdf")
+            {
+                FileDownloadName = record.Name.Replace(" ", "_") + ".pdf"
+            };
             return fileStreamResult;
         }
         public async Task<IActionResult> Enter(string returnUrl)
