@@ -254,7 +254,7 @@ namespace Instructions.Controllers
                 AutoDetectEncoding = false,
                 OverrideEncoding = Encoding.UTF8
             };
-            string[] elements=new string[3] { "//nav[contains(@class, 'navbar')]" , "//div[contains(@id, 'content')]", "//a[contains(@href, '#carousel')]" }
+            string[] elements = new string[3] { "//nav[contains(@class, 'navbar')]", "//div[contains(@id, 'content')]", "//a[contains(@href, '#carousel')]" };
             var docNode = htmlWeb.Load(path).DocumentNode;
             foreach (string s in elements)
             {
