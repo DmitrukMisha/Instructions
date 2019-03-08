@@ -122,6 +122,19 @@ else
     });
 </script>
 <script type="text/javascript">
+   // var check = function() {
+     /*   $.ajax({
+            url: '/Home/CommentsUpdate',
+            type: 'POST',
+            cache: false,
+            async: true,
+            dataType: "json",
+        })
+            .done(function (result) {
+                alert(result);
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })};*/
     $(document).ready(function () {
         $.ajax({
             url: '/Home/Comments',
@@ -135,8 +148,28 @@ else
             }).fail(function (xhr) {
                 console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
             })
+      //  setInterval(check, 20000)
     });
+
 </script>
+
+<script type="text/javascript">
+   /* $(document).ready(setInterval(/*function () {
+        $.ajax({
+            url: '/Home/CommentsUpdate',
+            type: 'POST',
+            cache: false,
+            async: true,
+            dataType: "json",
+        })
+            .done(function (result) {
+                if (result == true) alert("true");
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })
+    })*///alert("zhopa"), 1000));
+</script>
+
 <script type="text/javascript">
     $('#add').on('click', function (e) {
         $.ajax({

@@ -161,11 +161,17 @@ namespace Instructions.Controllers
                 ViewData["Role"] = user.RoleISAdmin;
                 ViewBag.Likes = GetLikes(comments);
             }
-
+            ViewData["count"] = comments.Count();
             ViewBag.LikesCount = LikesCount(comments);
             return PartialView(comments);
         }
-
+        [HttpPost]
+        public IActionResult CommentsUpdate(int count)
+        {
+            if (count != DbContext.Comments.Where(a => a.RecordID == record.RecordID).Count())
+                return Json(true);
+            else return Json(false);
+        }
         public List<bool> GetLikes(List<Comment> comments)
         {
             List<bool> LikesIsSet = new List<bool>();
