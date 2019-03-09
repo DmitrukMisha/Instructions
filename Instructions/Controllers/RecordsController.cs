@@ -29,7 +29,7 @@ namespace Instructions.Controllers
             static string RecordIdForUpdate;
             static List<int> StepsIdForUpdate;
             static List<int> StepsIdForDelete;
-            static List<int> TagsIdForDelete;
+            static List<int> TagsIdForUpdate;
 
         public RecordsController(ApplicationDbContext context,UserManager<User> userManager, IConfiguration configuration)
             {     
@@ -52,7 +52,7 @@ namespace Instructions.Controllers
         {
             StepsIdForUpdate = new List<int>();
             StepsIdForDelete = new List<int>();
-            TagsIdForDelete = new List<int>();
+            TagsIdForUpdate = new List<int>();
             if (RecordId != null)
                 RecordIdForUpdate = RecordId;
                var tags = Recordcontext.Tags.Select(t => t.TagName).ToList().Distinct();
@@ -78,7 +78,7 @@ namespace Instructions.Controllers
             foreach(Tag tag in TagsList)
             {
                tags+=tag.TagName;
-                TagsIdForDelete.Add(tag.TagID);
+                TagsIdForUpdate.Add(tag.TagID);
             }
             return tags;
         }
@@ -180,8 +180,7 @@ namespace Instructions.Controllers
                Recordcontext.Records.Update(recordfromdb);
                 await Recordcontext.SaveChangesAsync();
                 await UpdateSteps(StepName, Text, recordfromdb);
-                if (Tags != null)
-                    await UpdateTags(recordfromdb, Tags);
+                await UpdateTags(recordfromdb, Tags);
                 return Redirect("/home");
             }
             return Redirect("~/Identity/Account/Login");
@@ -255,35 +254,43 @@ namespace Instructions.Controllers
         }
         public async Task UpdateTags(Record record, string Tags)
         {
-            DeleteTagsFromDB();
             Tags = Tags.Replace(",", String.Empty);
             List<string> TagsList = Tags.Split("#").ToList();
-            foreach (string Tag in TagsList)
+            TagsList.Remove("");
+            int u = TagsList.Count() - TagsIdForUpdate.Count();
+            for (int i=0;i<TagsList.Count();i++)
             {
-                if (Tag != "")
-                {
-                    Tag tag = new Tag
+                    if (i<TagsIdForUpdate.Count())
                     {
-                        Record = record,
-                        TagName = "#" + Tag.Replace(" ", String.Empty)
-                    };
-                     Recordcontext.Tags.Add(tag);
+                        Tag tagfromdb = Recordcontext.Tags.Where(a => a.TagID == TagsIdForUpdate.ElementAt(i)).FirstOrDefault();
+                        if ("#" + TagsList.ElementAt(i).Replace(" ", String.Empty) != tagfromdb.TagName)
+                        {
+                            tagfromdb.TagName = "#" + TagsList.ElementAt(i).Replace(" ", String.Empty);
+                            Recordcontext.Tags.Update(tagfromdb);
+                        }
+                    }
+                    else
+                    {
+                        Tag tag = new Tag
+                        {
+                            Record = record,
+                            TagName = "#" + TagsList.ElementAt(i).Replace(" ", String.Empty)
+                        };
+                        Recordcontext.Tags.Add(tag);
+                    }
+            }
+            if (u < 0)
+            {
+                for(int i=TagsList.Count(); i < TagsIdForUpdate.Count(); i++)
+                {
+                    Tag TagForDelete = Recordcontext.Tags.Where(a => a.TagID == TagsIdForUpdate.ElementAt(i)).FirstOrDefault();
+                    Recordcontext.Tags.Remove(TagForDelete);
                 }
-
             }
             await Recordcontext.SaveChangesAsync();
-
         }
         
-        private async void DeleteTagsFromDB()
-        {
-            foreach (int ID in TagsIdForDelete)
-            {
-                Tag tag = Recordcontext.Tags.Where(a => a.TagID == ID).FirstOrDefault();
-                Recordcontext.Tags.Remove(tag);
-            }
-            await Recordcontext.SaveChangesAsync();
-        }
+      
 
         private async Task<string> CreateImageForRecord(Record record)
         {

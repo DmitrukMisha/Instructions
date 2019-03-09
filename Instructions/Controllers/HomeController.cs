@@ -72,13 +72,15 @@ namespace Instructions.Controllers
         public IActionResult Record(string id)
         {
             ViewData["EmailConfirmed"] = false;
+            ViewData["readonly"] = "true";
             if (user != null)
             {
                 ViewData["EmailConfirmed"] = user.EmailConfirmed;
                 ViewData["Role"] = user.RoleISAdmin;
+                ViewData["readonly"] = "false";
             }
             ViewData["RecordID"] = Convert.ToInt32(id);
-            
+            ViewData["RatingValue"] = GetRating(id);
             record = GetRecord(id);
             GetRecordData(id);
             return View(GetSteps(GetRecord(id)));
@@ -97,6 +99,23 @@ namespace Instructions.Controllers
 
             return View(DbContext.Themes.ToList());
         }
+        public string GetRating(string id)
+        {
+            List<Mark> marks = DbContext.Marks.Where(a => a.RecordID.RecordID == Int32.Parse(id)).ToList();
+            if (marks.Count() != 0)
+            {
+                double value = 0;
+                foreach (Mark mark in marks)
+                {
+                    value += mark.MarkValue;
+                }
+                value = value / marks.Count();
+                return (Math.Round(value * 2, MidpointRounding.AwayFromZero) / 2).ToString().Replace(",", ".");
+            }
+            else { return "0"; }
+        }
+
+    
 
         public void GetRecordData(string id)
         {
@@ -211,6 +230,28 @@ namespace Instructions.Controllers
             return RedirectToAction("Comments");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> AddMark(string value, int id)
+        {
+            
+            double doubleValue = Convert.ToDouble(value.Replace(".", ","));
+            Record record = DbContext.Records.Where(a => a.RecordID == id).FirstOrDefault();
+            User user = _userManager.GetUserAsync(User).Result;
+            Mark mark = DbContext.Marks.Where(a => a.RecordID.RecordID == id && a.UserID.Id == user.Id).SingleOrDefault();
+            if (mark == null)
+            {
+                mark = new Mark { RecordID = record, UserID = user, MarkValue = doubleValue };
+                await DbContext.Marks.AddAsync(mark);
+            }
+            else
+            {
+                mark.MarkValue = doubleValue;
+                DbContext.Marks.Update(mark);
+            }
+            await DbContext.SaveChangesAsync();
+
+            return Json(GetRating(id.ToString())) ;
+        }
         public async void DeleteLikes(Comment comment)
         {
             List<Like> likes = DbContext.Likes.Where(a => a.CommentID == comment).ToList();
@@ -263,6 +304,7 @@ namespace Instructions.Controllers
                         }
                         DeleteComments(record);
                         DeleteTags(record);
+                        DeleteMarks(record);
                         DbContext.Records.Remove(record);
                         await DbContext.SaveChangesAsync();
                         
@@ -272,6 +314,15 @@ namespace Instructions.Controllers
             return Redirect("~/Identity/Account/Manage/PersonalInstructions");
         }
 
+        public async void DeleteMarks(Record record)
+        {
+            List<Mark> marks = DbContext.Marks.Where(a => a.RecordID == record).ToList();
+            foreach(Mark mark in marks)
+            {
+                DbContext.Marks.Remove(mark);
+            }
+            await DbContext.SaveChangesAsync();
+        }
         [HttpPost]
         public async Task<IActionResult> CreateComment(string Text)
         {
@@ -473,8 +524,30 @@ namespace Instructions.Controllers
             }
             else return Redirect("~/Identity/Account/Manage/AdminMenu");
         }
+        [HttpPost]
+        public async Task<ActionResult> MakeAdmin(string[] selected)
+        {
 
+            if (selected != null)
+            {
+                foreach (var id in selected)
+                {
+                    User user = await _userManager.FindByIdAsync(id);
+                    if (user != null)
+                    {
+                        if (user.RoleISAdmin == true)
+                        {
+                            user.RoleISAdmin = false;
+                        }
+                        else { user.RoleISAdmin = true; }
+                        await _userManager.UpdateAsync(user);
+                    }
+                }
+            }
 
+            return Redirect("~/Identity/Account/Manage/AdminMenu");
+        }
+       
         [HttpPost]
         public async Task<ActionResult> Lock(string[] selected)
         {

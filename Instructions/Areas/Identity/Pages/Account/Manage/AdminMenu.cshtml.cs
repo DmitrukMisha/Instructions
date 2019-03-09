@@ -24,9 +24,10 @@ namespace Instructions.Areas.Identity.Pages.Account.Manage
 
         }
 
-        public IActionResult AdminMenu()
+        public async Task<IActionResult> OnGet()
         {
-
+            var user = await _userManager.GetUserAsync(User);
+            ViewData["EmailConfirm"] = user.EmailConfirmed;
             return Page();
 
         }

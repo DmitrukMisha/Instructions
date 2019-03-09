@@ -4,13 +4,18 @@
 @{
     ViewData["Title"] = "Instructions";
     ViewData["ActivePage"] = ManageNavPages.PersonalInstructions;
-    
+
 }
 
 
 <h4>@ViewData["Title"]</h4>
-
-
+@if (ViewData["EmailConfirm"].ToString() == "False")
+{
+    <script language="JavaScript">
+        alert("Confirm your E-mail");
+        location.href = "Index";
+    </script>
+}
 <form method="post">
     <table class="table">
         <tr>
@@ -18,7 +23,8 @@
             <th>
                 <button type="submit" asp-controller="Home" asp-action="DeleteRecords" class="btn btn-sm btn-danger"> Delete</button>
             </th>
-            <th></th><th></th>
+            <th></th>
+            <th></th>
         </tr>
         <tr>
             <th>

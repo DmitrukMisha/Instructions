@@ -15,6 +15,7 @@ namespace Instructions.Data
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Like> Likes { get; set; }
+        public DbSet<Mark> Marks { get; set; }
         public DbSet<Image> Images { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
