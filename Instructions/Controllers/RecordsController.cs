@@ -66,21 +66,23 @@ namespace Instructions.Controllers
             StepsIdForUpdate = new List<int>();
             StepsIdForDelete = new List<int>();
             TagsIdForUpdate = new List<int>();
+            activeSteps = new List<int>();
+            filePaths = new List<FilePath>();
             if (RecordId != null)
                 RecordIdForUpdate = RecordId;
                var tags = Recordcontext.Tags.Select(t => t.TagName).ToList().Distinct();
             ViewBag.Tags = new HtmlString(JsonConvert.SerializeObject(tags, Formatting.None));
             ViewBag.Themes = Recordcontext.Themes.ToList();
-            id = 0;
             Record record = Recordcontext.Records.Where(a => a.RecordID == Int32.Parse(RecordIdForUpdate)).FirstOrDefault();
             List<Step> steps = Recordcontext.Steps.Where(a => a.RecordID == record).ToList();
             ViewBag.Steps = steps;
             ViewData["TagsList"] = TagsList(record);
-            
             foreach(Step step in steps)
             {
                 StepsIdForUpdate.Add(step.StepID);
+                activeSteps.Add(step.StepID);
             }
+            id = StepsIdForUpdate.Max();
             return View(record);
         }
 
@@ -243,7 +245,7 @@ namespace Instructions.Controllers
 
         }
 
-        }
+        
 
         [HttpPost]
         public  void DelStepFromDB(int StepID)
