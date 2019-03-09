@@ -82,7 +82,7 @@ namespace Instructions.Controllers
             if (user != null)
             {
                 ViewData["Role"] = user.RoleISAdmin;
-               
+                ViewData["Email"] = user.EmailConfirmed;
             }
             ViewData["id"] = id;
             themes =themes.Concat(DbContext.Themes.Select(a => a.Themes).ToList()).ToList();

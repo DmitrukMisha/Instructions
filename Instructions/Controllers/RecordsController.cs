@@ -18,35 +18,39 @@ using System.IO;
 namespace Instructions.Controllers
 {
     public class RecordsController : Controller
-        {
-            private readonly UserManager<User> _userManager;
-            static List<FilePath> filePaths;
-            private ApplicationDbContext Recordcontext;
-            private readonly IConfiguration Configuration;
-            static int id;
-            static string MainFileName;
-            static FileStream MainFile;
-             static List<int> activeSteps;
-            static User CreatingUser;
-           
-            
+    {
+        private readonly UserManager<User> _userManager;
+        static List<FilePath> filePaths;
+        private ApplicationDbContext Recordcontext;
+        private readonly IConfiguration Configuration;
+        static int id;
+        static string MainFileName;
+        static FileStream MainFile;
+        static List<int> activeSteps;
+        static User CreatingUser;
 
-        public RecordsController(ApplicationDbContext context,UserManager<User> userManager, IConfiguration configuration)
-            {
-                
-                Recordcontext = context;
-                _userManager = userManager;
-                 Configuration = configuration;
+
+
+        public RecordsController(ApplicationDbContext context, UserManager<User> userManager, IConfiguration configuration)
+        {
+
+            Recordcontext = context;
+            _userManager = userManager;
+            Configuration = configuration;
 
         }
 
-          
-            public IActionResult Index(string userID)
-            {
-          if (User.Identity.Name == null)
+
+        public IActionResult Index(string userID)
+        {
+            if (User.Identity.Name == null)
                 return Redirect("~/Identity/Account/Login");
-             CreatingUser = _userManager.FindByIdAsync(userID).Result;
-           var tags = Recordcontext.Tags.Select(t => t.TagName).ToList().Distinct();
+            CreatingUser = _userManager.FindByIdAsync(userID).Result;
+            if (CreatingUser == null)
+                CreatingUser = _userManager.GetUserAsync(User).Result;
+            if (!CreatingUser.EmailConfirmed&&!_userManager.GetUserAsync(User).Result.RoleISAdmin)
+                return Redirect("~/Home");
+            var tags = Recordcontext.Tags.Select(t => t.TagName).ToList().Distinct();
             ViewBag.Tags =new HtmlString(JsonConvert.SerializeObject(tags,Formatting.None)) ;
             ViewBag.Themes= Recordcontext.Themes.ToList();
             activeSteps = new List<int>();
@@ -150,8 +154,7 @@ namespace Instructions.Controllers
         [HttpPost]
            public async Task<IActionResult> Create(Record record, List<string> StepName, List<string> Text, string Tags)
             {
-            if (CreatingUser == null)
-                CreatingUser = _userManager.GetUserAsync(User).Result;
+           
                 record.USerID = CreatingUser.Id;
                 if (MainFile!=null)
                 record.ImageLink=await CreateImageForRecord(record);                
