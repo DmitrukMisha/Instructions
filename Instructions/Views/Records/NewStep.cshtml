@@ -58,7 +58,7 @@
     Dropzone.autoDiscover = false;
     var el = "div.step-"+@ViewData["id"];
     var myDropzone = new Dropzone(el, {
-        url: "Records/UploadFilesFromStep",
+        url: "/Records/UploadFilesFromStep",
         maxFiles: 3,
         maxfilesexceeded: function (file) {
             alert("Max 3 files here");
