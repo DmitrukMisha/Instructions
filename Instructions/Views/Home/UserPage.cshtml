@@ -5,12 +5,20 @@
 
 <h1 style="font-weight:bold">@ViewData["Name"]'s page</h1>
 <hr />
-<select id="Themes" name="Themes">
-    @foreach(string theme in ViewBag.Themes)
+<div class="row">
+    <div class="col-md-5">
+        <select id="Themes" name="Themes">
+            @foreach (string theme in ViewBag.Themes)
+            {
+                <option>@theme</option>
+            }
+        </select>
+    </div>
+    @if ((User.Identity.Name!=null)&&((bool)ViewData["Role"] || User.Identity.Name==(string)ViewData["Name"]))
     {
-        <option>@theme</option>
+    <a asp-controller="Records" asp-action="Index" asp-route-userID="@ViewData["id"]" class="col-md-4">Create new record</a>
     }
-</select>
+</div>
 @foreach (Record item in Model)
 {
     <div class="jumbotron"  myattr="@item.ThemeName">

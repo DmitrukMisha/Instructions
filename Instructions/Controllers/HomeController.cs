@@ -74,20 +74,29 @@ namespace Instructions.Controllers
 
         public IActionResult UserPage(string id)
         {
-            ViewData["Name"] = GetUserById(id);
+            ViewData["Name"] = GetUserById(id).UserName;
             List<string> themes = new List<string>
             {
                 "-"
             };
+            if (user != null)
+            {
+                ViewData["Role"] = user.RoleISAdmin;
+               
+            }
+            ViewData["id"] = id;
             themes =themes.Concat(DbContext.Themes.Select(a => a.Themes).ToList()).ToList();
             ViewBag.Themes = themes;
-            return View(GetRecords(GetUserById(id)));
+            var records = GetRecords(GetUserById(id));
+            records.Reverse();
+            return View(records);
         }
 
         public IActionResult AddTheme()
         {
-
-            return View(DbContext.Themes.ToList());
+            if (user != null && user.RoleISAdmin)
+                return View(DbContext.Themes.ToList());
+            else return Redirect("~/home");
         }
 
         public void GetRecordData(string id)

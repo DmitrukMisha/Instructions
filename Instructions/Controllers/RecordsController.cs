@@ -27,7 +27,7 @@ namespace Instructions.Controllers
             static string MainFileName;
             static FileStream MainFile;
              static List<int> activeSteps;
-            
+            static User CreatingUser;
            
             
 
@@ -41,10 +41,11 @@ namespace Instructions.Controllers
         }
 
           
-            public IActionResult Index()
+            public IActionResult Index(string userID)
             {
           if (User.Identity.Name == null)
                 return Redirect("~/Identity/Account/Login");
+             CreatingUser = _userManager.FindByIdAsync(userID).Result;
            var tags = Recordcontext.Tags.Select(t => t.TagName).ToList().Distinct();
             ViewBag.Tags =new HtmlString(JsonConvert.SerializeObject(tags,Formatting.None)) ;
             ViewBag.Themes= Recordcontext.Themes.ToList();
@@ -149,8 +150,9 @@ namespace Instructions.Controllers
         [HttpPost]
            public async Task<IActionResult> Create(Record record, List<string> StepName, List<string> Text, string Tags)
             {
-                User user =await _userManager.GetUserAsync(User);         
-                record.USerID = user.Id;
+            if (CreatingUser == null)
+                CreatingUser = _userManager.GetUserAsync(User).Result;
+                record.USerID = CreatingUser.Id;
                 if (MainFile!=null)
                 record.ImageLink=await CreateImageForRecord(record);                
                 Recordcontext.Records.Add(record);              
@@ -233,14 +235,17 @@ namespace Instructions.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateTheme(string theme_name)
         {
-            Theme theme = new Theme
+            if (User != null)
             {
-                Themes = theme_name        
-            };
-               Recordcontext.Themes.Add(theme);
+                Theme theme = new Theme
+                {
+                    Themes = theme_name
+                };
+                Recordcontext.Themes.Add(theme);
 
-            
-            await Recordcontext.SaveChangesAsync();
+
+                await Recordcontext.SaveChangesAsync();
+            }
             return Redirect("~/Home/AddTheme");
         }
 
