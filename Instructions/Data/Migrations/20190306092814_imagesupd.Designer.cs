@@ -4,18 +4,20 @@ using Instructions.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Instructions.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190306092814_imagesupd")]
+    partial class imagesupd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.8-servicing-32085")
+                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -72,27 +74,6 @@ namespace Instructions.Data.Migrations
                     b.HasIndex("UserIDId");
 
                     b.ToTable("Likes");
-                });
-
-            modelBuilder.Entity("Instructions.Models.Mark", b =>
-                {
-                    b.Property<int>("MarkID")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<double>("MarkValue");
-
-                    b.Property<int?>("RecordID1");
-
-                    b.Property<string>("UserIDId");
-
-                    b.HasKey("MarkID");
-
-                    b.HasIndex("RecordID1");
-
-                    b.HasIndex("UserIDId");
-
-                    b.ToTable("Marks");
                 });
 
             modelBuilder.Entity("Instructions.Models.Record", b =>
@@ -354,17 +335,6 @@ namespace Instructions.Data.Migrations
                     b.HasOne("Instructions.Models.Comment", "CommentID")
                         .WithMany()
                         .HasForeignKey("CommentID1");
-
-                    b.HasOne("Instructions.Models.User", "UserID")
-                        .WithMany()
-                        .HasForeignKey("UserIDId");
-                });
-
-            modelBuilder.Entity("Instructions.Models.Mark", b =>
-                {
-                    b.HasOne("Instructions.Models.Record", "RecordID")
-                        .WithMany()
-                        .HasForeignKey("RecordID1");
 
                     b.HasOne("Instructions.Models.User", "UserID")
                         .WithMany()

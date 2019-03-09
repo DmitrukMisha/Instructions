@@ -4,7 +4,6 @@
     {
         ViewData["Update"] = "false";
         ViewData["StepID"] = "Unexpected";
-
     }
     else
     {
@@ -23,6 +22,7 @@
         <span asp-validation-for="StepName" class="text-danger"></span>
     </div>
 
+
     <div class="form-group">
         <label asp-for="Text" class="control-label"></label>
         <textarea required asp-for="Text" rows="5" class="form-control"></textarea>
@@ -33,7 +33,7 @@
       
         </div>
     </div>
-    <button type="button" class="btn btn-danger del-step">Delete step</button>
+    <button type="button" class="btn btn-danger del-step" commid="@ViewData["id"]">Delete step</button>
 </div>
 <script type="text/javascript">
     $(".del-step").click(function () {
@@ -43,8 +43,13 @@
                 url: '/Records/DelStepFromDB',
                 type: 'POST',
                 data: "StepID=" + @ViewData["StepID"],
-            })
+            });
         }
+        $.ajax({
+            url: '/Records/RemoveStepIdFromList',
+            type: 'POST',
+            data: { "id": $(this).attr("commid") }
+        });
         $(this).closest(".myclass").remove();
         return false;
     });
@@ -75,4 +80,19 @@
             })
        // formData.append('userName', 'bob');
     });
+    myDropzone.on("removedfile", function (file, xhr, formData) {
+        $.ajax({
+            url: '/Records/RemoveFileFromStep',
+            type: 'POST',
+            cache: false,
+            async: true,
+            data: { "id": @ViewData["id"], "filename": file.name },
+            dataType: "html"
+   
+        })
+            .fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })
+       // formData.append('userName', 'bob');
+    }); 
 </script>

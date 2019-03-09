@@ -16,6 +16,15 @@
       "provider": "cdnjs",
       "library": "jquery.rateit@1.1.1",
       "destination": "wwwroot/lib/jquery.rateit/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "bootstrap-modal@2.2.6",
+      "destination": "wwwroot/lib/bootstrap-modal/"
+    },
+    {
+      "library": "fancybox@3.5.6",
+      "destination": "wwwroot/lib/fancybox/"
     }
   ]
 }

@@ -5,7 +5,7 @@
 
 @for (Int32 i = 0; i < Model.Count(); i++)
 {
-    <div class="card border-primary mb-1" >
+    <div class="card border-primary mb-1">
         <div class="card-header">@Model.ElementAt(i).UserName</div>
         <div class="card-body">
             <p class="card-text">@Model.ElementAt(i).Text</p>
@@ -15,20 +15,20 @@
                 <div class="col align-self-end">
                     @if (User.Identity.Name == null || !(bool)ViewData["EmailConfirmed"])
                     {
-                    <button type="button" class="btn btn-outline-secondary " style="max-width: 3rem;" commid="@Model.ElementAt(i).CommentID">❤</button>
+                        <button type="button" class="btn btn-outline-secondary " style="max-width: 3rem;" commid="@Model.ElementAt(i).CommentID">❤</button>
                     }
                     else
                     {
-                    @if (ViewBag.Likes[i])
-                    {<button type="button" class="btn btn-success " style="max-width: 3rem;" commid="@Model.ElementAt(i).CommentID">❤</button>
-                    }
-                    else
-                    { <button type="button" class="btn btn-outline-success" style="max-width: 3rem;" commid="@Model.ElementAt(i).CommentID">❤</button>}}
+                        @if (ViewBag.Likes[i])
+                        {<button type="button" class="btn btn-success " style="max-width: 3rem;" commid="@Model.ElementAt(i).CommentID">❤</button>
+                        }
+                        else
+                        { <button type="button" class="btn btn-outline-success" style="max-width: 3rem;" commid="@Model.ElementAt(i).CommentID">❤</button>}}
                     @ViewBag.LikesCount[i]
                 </div>
             </div>
         </div>
-        @if (User.Identity.Name!=null&&(User.Identity.Name == Model.ElementAt(i).UserName || (bool)ViewData["Role"]))
+        @if (User.Identity.Name != null && (User.Identity.Name == Model.ElementAt(i).UserName || (bool)ViewData["Role"]))
         {
             <hr />
             <div class="btn-group" role="group" aria-label="Basic example">
@@ -63,7 +63,7 @@
             $('.btn-info').hide();
             $(this).closest('.btn-info').show();
             var text = $(this).closest('.card-text').text();
-            $(this).closest(".card ").append("<div id='changes'><p>Enter changes</p><input type='text' name='EditComment' id='EditComment' value='" + text + "' class='form-control' /></div>");
+            $(this).closest(".card ").append("<div id='changes'><p>Enter changes</p><input type='text' name='EditComment' id='EditComment' class='form-control' /></div>");
             $(this).closest('#edit').val("Save");
 
         }
@@ -73,7 +73,7 @@
                 type: 'POST',
                 cache: false,
                 async: true,
-                data: { "id": $(this).attr("commid"), "Text": $('#EditComment').serialize() },
+                data: { "id": $(this).attr("commid"), "Text": $('#EditComment').val() },
                 dataType: "html"
             })
                 .done(function (result) {
@@ -97,10 +97,10 @@
             async: true,
             data: { "id": $(this).attr("commid") },
             dataType: "html"
-   
+
         })
             .done(function (result) {
-              
+
                 $('#Comments').html(result);
 
             }).fail(function (xhr) {
@@ -129,4 +129,42 @@
 </script>
 <script type="text/javascript">
     $('.btn-outline-secondary').on('click', function (e) { alert("You need log in or confirm email to like"); })
+</script>
+
+<script type="text/javascript">
+   function update(interval) {
+        $.ajax({
+            url: '/Home/Comments',
+            type: 'POST',
+            cache: false,
+            async: false,
+            dataType: "html",
+        })
+            .done(function (result) {
+                clearInterval(interval);
+                $('#Comments').html(result);
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })
+    };
+   
+    $(document).ready(function () {
+        var interval = setInterval(function () {
+            $.ajax({
+                url: '/Home/CommentsUpdate',
+                type: 'POST',
+                cache: false,
+                async: false,
+                data: { "count": @ViewData["count"] },
+                dataType: "json",
+            })
+                .done(function (result) {
+                    if (result == true) {
+                        update(interval);
+                    }
+                }).fail(function (xhr) {
+                    console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+                })
+        }, 5000);
+    });
 </script>
