@@ -63,7 +63,7 @@
             $('.btn-info').hide();
             $(this).closest('.btn-info').show();
             var text = $(this).closest('.card-text').text();
-            $(this).closest(".card ").append("<div id='changes'><p>Enter changes</p><input type='text' name='EditComment' id='EditComment' value='" + text + "' class='form-control' /></div>");
+            $(this).closest(".card ").append("<div id='changes'><p>Enter changes</p><input type='text' name='EditComment' id='EditComment' class='form-control' /></div>");
             $(this).closest('#edit').val("Save");
 
         }
@@ -73,7 +73,7 @@
                 type: 'POST',
                 cache: false,
                 async: true,
-                data: { "id": $(this).attr("commid"), "Text": $('#EditComment').serialize() },
+                data: { "id": $(this).attr("commid"), "Text": $('#EditComment').val() },
                 dataType: "html"
             })
                 .done(function (result) {

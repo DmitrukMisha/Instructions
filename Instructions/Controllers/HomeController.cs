@@ -75,7 +75,12 @@ namespace Instructions.Controllers
         public IActionResult UserPage(string id)
         {
             ViewData["Name"] = GetUserById(id);
-           
+            List<string> themes = new List<string>
+            {
+                "-"
+            };
+            themes =themes.Concat(DbContext.Themes.Select(a => a.Themes).ToList()).ToList();
+            ViewBag.Themes = themes;
             return View(GetRecords(GetUserById(id)));
         }
 
@@ -241,7 +246,7 @@ namespace Instructions.Controllers
         public async Task<IActionResult> EditComment(int id, string Text)
         {
             Comment comment = DbContext.Comments.Where(a => a.CommentID == id).FirstOrDefault();
-            comment.Text = Text.Remove(0, 12);
+            comment.Text = Text;    
             DbContext.Update(comment);
             await DbContext.SaveChangesAsync();
             return RedirectToAction("Comments");
@@ -397,6 +402,20 @@ namespace Instructions.Controllers
             }
         }
 
+        public List<Record> FilterByThemes(List<Record> records,string Theme)
+        {
+            return records.Where(a => a.ThemeName == Theme).ToList();
+        }
+
+        public async Task RemoveUserLikes(User user)
+        {
+            var likes = DbContext.Likes.Where(a => a.UserID == user).ToList();
+            foreach ( var like in likes)
+            {
+                DbContext.Likes.Remove(like);
+            }
+            await DbContext.SaveChangesAsync();
+        }
 
         [HttpPost]
         public async Task<ActionResult> Delete(string[] selected)
@@ -409,6 +428,7 @@ namespace Instructions.Controllers
                     User user = await _userManager.FindByIdAsync(id);
                     if (user != null)
                     {
+                        await RemoveUserLikes(user);
                         if (User.Identity.Name == user.Email) IsI = true;
                         IdentityResult result = await _userManager.DeleteAsync(user);
                     }
