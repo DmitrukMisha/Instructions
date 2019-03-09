@@ -35,12 +35,14 @@ namespace Instructions.Controllers
         [HttpPost]
         public IActionResult Index(string TextSearchInput)
         {
-            SearchViewModel model = new SearchViewModel();
-            model.Success = true;
-            model.Text = TextSearchInput;
-          //  model.Records = dbContext.Records;
-           // model.Users = dbContext.Users;
-           // model.Steps = dbContext.Steps;
+            SearchViewModel model = new SearchViewModel
+            {
+                Success = true,
+                Text = TextSearchInput
+            };
+            //  model.Records = dbContext.Records;
+            // model.Users = dbContext.Users;
+            // model.Steps = dbContext.Steps;
             List<Record> records = dbContext.Records.ToList();
             AuthorDataView(records);
 

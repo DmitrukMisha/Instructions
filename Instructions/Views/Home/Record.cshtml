@@ -1,4 +1,6 @@
 ﻿@model IEnumerable<Instructions.Models.Step>
+@using System.Collections.Generic
+@using Westwind.AspNetCore.Markdown
 @{
     ViewData["Title"] = @ViewData["Name"];
 }
@@ -16,6 +18,7 @@
 <hr />
 @if (Model.Count() != 0)
 {
+
     <div id="carousel" class="carousel slide" data-ride="carousel">
         <!-- Индикаторы -->
         <div class="carousel-inner">
@@ -24,18 +27,60 @@
                 <div class="jumbotron">
                     <h1>@Model.ElementAt(0).StepName</h1>
                     <hr />
-                    <p>@Model.ElementAt(0).Text</p>
 
+                   
+                        <div>@Markdown.ParseHtmlString(Model.ElementAt(0).Text)</div>
+
+                    <div class="row justify-content-center">
+                        @if (ViewBag.images != null)
+                        {
+                            List<Image> images = ViewBag.images;
+                            List<Image> imagesForStep = images.FindAll(a => a.StepID == Model.ElementAt(0));
+                            if (imagesForStep != null)
+                            {
+                                foreach (Image image in imagesForStep)
+                                {
+                                    <center>
+                                        <a href="@image.Link" class="image col-md-2">
+                                            <img src="@image.Link" width="200" />
+                                        </a>
+                                    </center>
+                                }
+
+                            }
+                        }
+                    </div>
                 </div>
             </div>
-
             @for (Int32 i = 1; i < Model.Count(); i++)
             {
                 <div class="carousel-item">
+
                     <div class="jumbotron">
                         <h1> @Model.ElementAt(i).StepName</h1>
                         <hr />
                         <p>@Model.ElementAt(i).Text</p>
+
+
+                        <div class="row justify-content-center">
+                            @if (ViewBag.images != null)
+                            {
+                                List<Image> images = ViewBag.images;
+                                List<Image> imagesForStep = images.FindAll(a => a.StepID == Model.ElementAt(i));
+                                if (imagesForStep != null)
+                                {
+                                    foreach (Image image in imagesForStep)
+                                    {
+                                        <center>
+                                            <a href="@image.Link" class="image col-md-3">
+                                                <img src="@image.Link" width="200" />
+                                            </a>
+                                        </center>
+
+                                    }
+                                }
+                            }
+                        </div>
                     </div>
                 </div>
             }
@@ -53,63 +98,71 @@
     </div>
 }
 <hr />
-<p><a asp-controller="Home" asp-action="CreateFile">DownloadPDF</a></p>
-<hr />
-<div id="Comments"></div>
-<hr />
-@if (User.Identity.Name != null && (bool)ViewData["EmailConfirmed"])
-{
+<div id="content">
+    <p><a asp-controller="Home" asp-action="CreateFile" asp-route-path="@string.Format("{0}://{1}{2}{3}", Context.Request.Scheme, Context.Request.Host, Context.Request.Path, Context.Request.QueryString)">DownloadPDF</a></p>
+    <hr />
+    <div id="Comments"></div>
+    <hr />
+    @if (User.Identity.Name != null && (bool)ViewData["EmailConfirmed"])
+    {
 
-    <div class="form-group">
-        <label class="control-label">Comment</label>
-        <input type="text" name="Text" id="Text" class="form-control" />
+        <div class="form-group">
+            <label class="control-label">Comment</label>
+            <input type="text" name="Text" id="Text" class="form-control" />
+        </div>
+        <input type="submit" id="add" value="Send" class="btn btn-default" />
+    }
+    else
+    {
+        <h3>You need log in or confirm email to leave comments</h3>
+    }
     </div>
-    <input type="submit" id="add" value="Send" class="btn btn-default" />
-}
-else
-{
-    <h3>You need log in or confirm email to leave comments</h3>
-}
-<script type="text/javascript">
-    $(function () {
-        $('#carousel').carousel({
-            interval: false,
+    <script type="text/javascript">
+        $(function () {
+            $('#carousel').carousel({
+                interval: false
 
+            });
         });
-    });
-</script>
-<script type="text/javascript">
-    $(document).ready(function () {
-        $.ajax({
-            url: '/Home/Comments',
-            type: 'POST',
-            cache: false,
-            async: true,
-            dataType: "html",
-        })
-            .done(function (result) {
-                $('#Comments').html(result);
-            }).fail(function (xhr) {
-                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.ajax({
+                url: '/Home/Comments',
+                type: 'POST',
+                cache: false,
+                async: true,
+                dataType: "html",
             })
-    });
-</script>
-<script type="text/javascript">
-    $('#add').on('click', function (e) {
-        $.ajax({
-            url: '/Home/CreateComment',
-            type: 'POST',
-            cache: false,
-            async: true,
-            data: $('#Text').serialize(),
-            dataType: "html"
-        })
-            .done(function (result) {
-                $('#Comments').html(result);
-                $('#Text').val("");
-            }).fail(function (xhr) {
-                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
-            })
-    });
+                .done(function (result) {
+                    $('#Comments').html(result);
+                }).fail(function (xhr) {
+                    console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+                })
+        });
 
-</script>
+    </script>
+
+
+    <script type="text/javascript">
+        $('#add').on('click', function (e) {
+            $.ajax({
+                url: '/Home/CreateComment',
+                type: 'POST',
+                cache: false,
+                async: true,
+                data: $('#Text').serialize(),
+                dataType: "html"
+            })
+                .done(function (result) {
+                    $('#Comments').html(result);
+                    $('#Text').val("");
+                }).fail(function (xhr) {
+                    console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+                })
+        });
+
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () { $(".image").fancybox(); });
+    </script>

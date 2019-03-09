@@ -5,13 +5,34 @@
 
 <h1 style="font-weight:bold">@ViewData["Name"]'s page</h1>
 <hr />
+<div class="row">
+    <div class="col-md-5">
+        <select id="Themes" name="Themes">
+            @foreach (string theme in ViewBag.Themes)
+            {
+                <option>@theme</option>
+            }
+        </select>
+    </div>
+    @if ((User.Identity.Name!=null)&&((bool)ViewData["Role"] || User.Identity.Name==(string)ViewData["Name"]))
+    {
+        if ((bool)ViewData["Email"])
+        {
+    <a asp-controller="Records" asp-action="Index" asp-route-userID="@ViewData["id"]" class="col-md-4">Create new record</a>
+        }
+        else
+        {
+            <p class="col-md-4">Confirm email to create records</p>
+        }
+    }
+</div>
 @foreach (Record item in Model)
 {
-    <div class="jumbotron">
+    <div class="jumbotron"  myattr="@item.ThemeName">
         <p class="display-3" align="center"> <a asp-controller="Home" asp-action="Record" asp-route-id="@item.RecordID">@item.Name</a></p>
         <div class="row">
             <div class="col-md-3" align="left">
-                <p><font color="gray" size="2">Theme: @item.ThemeName</font></p>
+                <p><font color="gray" size="2" class="myclass">Theme: @item.ThemeName</font></p>
             </div>
         </div>
         <hr />
@@ -19,3 +40,14 @@
     </div>
 }
 
+<script type="text/javascript">
+    //$("#Themes option:selected").val() //$(".jumbotron").attr("myattr")
+    $("#Themes").change(function () {
+        $(".jumbotron").show();
+        if ($("#Themes option:selected").val() != "-") {
+            $(".jumbotron").hide();
+            $("[myattr=" + $("#Themes option:selected").val() + "]").show();
+        }
+    });
+   
+</script>

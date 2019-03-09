@@ -6,12 +6,6 @@
     ViewBag.Title = "Record creating";
 }
 <script src="~/lib/dropzone/dropzone.js"></script>
-<!--<form asp-controller="records" asp-action="UploadFiles" asp-antiforgery="false" class="dropzone" id="UploadFormRecord" enctype="multipart/form-data">
-    <div class="fallback">
-        <input name="file" type="file" multiple />
-        <input type="submit" value="Upload" />
-    </div>
-</form>-->
 <form asp-action="create" asp-controller="records">
     <div class="form-group">
         <label asp-for="Name" class="control-label">Name</label>
@@ -61,7 +55,7 @@
         }
         function extractLast(term) {
             return split(term).pop();
-        }
+        }   
 
         $("#tag").
             autocomplete({

@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Instructions.Models;
 using Instructions.Data;
-
 using System.Text;
 using Microsoft.Extensions.Localization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Syncfusion.Pdf;
-using Syncfusion.Pdf.Graphics;
-using Syncfusion.Drawing;
+//using Syncfusion.Pdf;
+//using Syncfusion.Pdf.Graphics;
+//using Syncfusion.Drawing;
 using System.IO;
-
+using IronPdf;
+using HtmlAgilityPack;
 namespace Instructions.Controllers
 {
     public class HomeController : Controller
@@ -27,6 +27,7 @@ namespace Instructions.Controllers
         private readonly IStringLocalizer<HomeController> _localizer;
         static User user;
         static Record record;
+        static int count=0,taken=10;
         public HomeController(IStringLocalizer<HomeController> localizer, UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context)
         {
             _userManager = userManager;
@@ -36,14 +37,23 @@ namespace Instructions.Controllers
         }
 
         public IActionResult Index()
-        {
-
-            List<Record> records = DbContext.Records.ToList();
+        {         
+            count= DbContext.Records.Count();
+            taken = 10;
             user = _userManager.GetUserAsync(User).Result;
+            return View();
+        }
+        [HttpPost]
+        public IActionResult RecordsView()
+        {
+            if (count < 10)
+                taken = count;
+            count -= taken;
+            List<Record> records = DbContext.Records.ToList().GetRange(count,taken);             
             records.Reverse();
             GetTags(records);
             AuthorDataView(records);
-            return View(records);
+            return PartialView(records);
         }
 
         public IActionResult Record(string id)
@@ -56,21 +66,37 @@ namespace Instructions.Controllers
             ViewData["RecordID"] = Convert.ToInt32(id);
             record = GetRecord(id);
             GetRecordData(id);
-            return View(GetSteps(GetRecord(id)));
+            var steps = GetSteps(record);
+            ViewBag.images=GetImages(steps);
+            return View(steps);
         }
 
 
         public IActionResult UserPage(string id)
         {
-            ViewData["Name"] = GetUserById(id);
-           
-            return View(GetRecords(GetUserById(id)));
+            ViewData["Name"] = GetUserById(id).UserName;
+            List<string> themes = new List<string>
+            {
+                "-"
+            };
+            if (user != null)
+            {
+                ViewData["Role"] = user.RoleISAdmin;
+                ViewData["Email"] = user.EmailConfirmed;
+            }
+            ViewData["id"] = id;
+            themes =themes.Concat(DbContext.Themes.Select(a => a.Themes).ToList()).ToList();
+            ViewBag.Themes = themes;
+            var records = GetRecords(GetUserById(id));
+            records.Reverse();
+            return View(records);
         }
 
         public IActionResult AddTheme()
         {
-
-            return View(DbContext.Themes.ToList());
+            if (user != null && user.RoleISAdmin)
+                return View(DbContext.Themes.ToList());
+            else return Redirect("~/home");
         }
 
         public void GetRecordData(string id)
@@ -96,7 +122,18 @@ namespace Instructions.Controllers
         {
             return DbContext.Steps.Where(a => a.RecordID == record).ToList();
         }
-
+        
+        public List<Models.Image> GetImages(List<Step> steps)
+        {
+            List<Models.Image> images = new List<Models.Image>();
+            foreach(Step step in steps)
+            {
+                List<Models.Image> imagesFromStep = DbContext.Images.Where(a => a.StepID == step).ToList();
+                images.AddRange(imagesFromStep);
+            }
+            return images;
+        }
+        
         public List<Record> GetRecords(User user)
         {
             return DbContext.Records.Where(a => a.USerID == user.Id).ToList();
@@ -138,11 +175,17 @@ namespace Instructions.Controllers
                 ViewData["Role"] = user.RoleISAdmin;
                 ViewBag.Likes = GetLikes(comments);
             }
-
+            ViewData["count"] = comments.Count();
             ViewBag.LikesCount = LikesCount(comments);
             return PartialView(comments);
         }
-
+        [HttpPost]
+        public IActionResult CommentsUpdate(int count)
+        {
+            if (count != DbContext.Comments.Where(a => a.RecordID == record.RecordID).Count())
+                return Json(true);
+            else return Json(false);
+        }
         public List<bool> GetLikes(List<Comment> comments)
         {
             List<bool> LikesIsSet = new List<bool>();
@@ -212,27 +255,36 @@ namespace Instructions.Controllers
         public async Task<IActionResult> EditComment(int id, string Text)
         {
             Comment comment = DbContext.Comments.Where(a => a.CommentID == id).FirstOrDefault();
-            comment.Text = Text.Remove(0, 12);
+            comment.Text = Text;    
             DbContext.Update(comment);
             await DbContext.SaveChangesAsync();
             return RedirectToAction("Comments");
         }
 
-        public FileResult CreateFile()
+        public FileResult CreateFile(string path)
         {
-            PdfDocument document = new PdfDocument();
-            PdfPage page = document.Pages.Add();
-            PdfGraphics graphics = page.Graphics;   
-            PdfFont font = new PdfStandardFont(PdfFontFamily.Helvetica, 20);
-            //graphics.DrawString("Hello World!!!", font, PdfBrushes.Black, new PointF(0, 0));
-            graphics.DrawString(record.Name, font, PdfBrushes.Black, new PointF(0, 0));
-          //  graphics.DrawString(record.Description, font, PdfBrushes.Black, new PointF(0, 20));
-            MemoryStream stream = new MemoryStream();
-            document.Save(stream);
+            HtmlWeb htmlWeb = new HtmlWeb
+            {
+                AutoDetectEncoding = false,
+                OverrideEncoding = Encoding.UTF8
+            };
+            string[] elements = new string[3] { "//nav[contains(@class, 'navbar')]", "//div[contains(@id, 'content')]", "//a[contains(@href, '#carousel')]" };
+            var docNode = htmlWeb.Load(path).DocumentNode;
+            foreach (string s in elements)
+            {
+                var removedNav = docNode.SelectNodes(s);
+                foreach (var content in removedNav)
+                    content.Remove();
+            }
+            HtmlToPdf renderer = new HtmlToPdf();
+            MemoryStream stream = renderer.RenderHtmlAsPdf(docNode.OuterHtml).Stream;
             stream.Position = 0;
-            FileStreamResult fileStreamResult = new FileStreamResult(stream, "application/pdf");
-            fileStreamResult.FileDownloadName = record.Name.Replace(" ","_")+".pdf";
+            FileStreamResult fileStreamResult = new FileStreamResult(stream, "application/pdf")
+            {
+                FileDownloadName = record.Name.Replace(" ", "_") + ".pdf"
+            };
             return fileStreamResult;
+            
         }
         public async Task<IActionResult> Enter(string returnUrl)
         {
@@ -359,6 +411,20 @@ namespace Instructions.Controllers
             }
         }
 
+        public List<Record> FilterByThemes(List<Record> records,string Theme)
+        {
+            return records.Where(a => a.ThemeName == Theme).ToList();
+        }
+
+        public async Task RemoveUserLikes(User user)
+        {
+            var likes = DbContext.Likes.Where(a => a.UserID == user).ToList();
+            foreach ( var like in likes)
+            {
+                DbContext.Likes.Remove(like);
+            }
+            await DbContext.SaveChangesAsync();
+        }
 
         [HttpPost]
         public async Task<ActionResult> Delete(string[] selected)
@@ -371,6 +437,7 @@ namespace Instructions.Controllers
                     User user = await _userManager.FindByIdAsync(id);
                     if (user != null)
                     {
+                        await RemoveUserLikes(user);
                         if (User.Identity.Name == user.Email) IsI = true;
                         IdentityResult result = await _userManager.DeleteAsync(user);
                     }
