@@ -28,17 +28,18 @@ namespace Instructions.Controllers
         static FileStream MainFile;
         static List<int> activeSteps;
         static User CreatingUser;
+        static string RecordIdForUpdate;
+        static List<int> StepsIdForUpdate;
+        static List<int> StepsIdForDelete;
+        static List<int> TagsIdForUpdate;
 
+        public RecordsController(ApplicationDbContext context,UserManager<User> userManager, IConfiguration configuration)
+            {     
+                Recordcontext = context;
+                _userManager = userManager;
+                 Configuration = configuration;
+            }
 
-
-        public RecordsController(ApplicationDbContext context, UserManager<User> userManager, IConfiguration configuration)
-        {
-
-            Recordcontext = context;
-            _userManager = userManager;
-            Configuration = configuration;
-
-        }
 
 
         public IActionResult Index(string userID)
@@ -59,20 +60,74 @@ namespace Instructions.Controllers
             MainFile = null;
             return View();
             }
+      
+        public IActionResult RecordEdit(string RecordId)
+        {
+            StepsIdForUpdate = new List<int>();
+            StepsIdForDelete = new List<int>();
+            TagsIdForUpdate = new List<int>();
+            if (RecordId != null)
+                RecordIdForUpdate = RecordId;
+               var tags = Recordcontext.Tags.Select(t => t.TagName).ToList().Distinct();
+            ViewBag.Tags = new HtmlString(JsonConvert.SerializeObject(tags, Formatting.None));
+            ViewBag.Themes = Recordcontext.Themes.ToList();
+            id = 0;
+            Record record = Recordcontext.Records.Where(a => a.RecordID == Int32.Parse(RecordIdForUpdate)).FirstOrDefault();
+            List<Step> steps = Recordcontext.Steps.Where(a => a.RecordID == record).ToList();
+            ViewBag.Steps = steps;
+            ViewData["TagsList"] = TagsList(record);
+            
+            foreach(Step step in steps)
+            {
+                StepsIdForUpdate.Add(step.StepID);
+            }
+            return View(record);
+        }
 
+        public string TagsList (Record record)
+        {
+            string tags="";
+            List<Tag> TagsList = Recordcontext.Tags.Where(a => a.Record.RecordID == record.RecordID).ToList();
+            foreach(Tag tag in TagsList)
+            {
+               tags+=tag.TagName;
+                TagsIdForUpdate.Add(tag.TagID);
+            }
+            return tags;
+        }
         [HttpPost]
-        public IActionResult NewStep()
+        public IActionResult NewStep(string stepId)
         {
             id++;
             activeSteps.Add(id);
             ViewData["id"] = id;
-           return PartialView();
+            if (stepId == null)
+            {
+                return PartialView();
+            }
+            else
+            {
+                Step step = Recordcontext.Steps.Where(a => a.StepID == int.Parse(stepId)).FirstOrDefault();
+                return PartialView(step);
+            }
         }
+
+
+        [HttpPost]
+        public IActionResult Photo(string Id, string Link, bool IsRecord)
+        {
+            ViewData["PhotoID"] = Id;
+            ViewData["Link"] = Link;
+            ViewData["IsRecord"] = IsRecord;
+            return PartialView();
+        }  
+
         
         [HttpPost]
         public void RemoveStepIdFromList(int id)
         {
             activeSteps.Remove(id);
+
         }
 
         public async Task CreateSteps(List<string> StepName, List<string> Text, Record record)
@@ -166,6 +221,135 @@ namespace Instructions.Controllers
                 return Redirect("/home");
             }
 
+        [HttpPost]
+        public async Task<IActionResult> Update(Record record, List<string> StepName, List<string> Text, string Tags)
+        {
+            User user = await _userManager.GetUserAsync(User);
+            if (user != null)
+            {
+                Record recordfromdb = Recordcontext.Records.Where(a => a.RecordID == Int32.Parse(RecordIdForUpdate)).FirstOrDefault();
+                recordfromdb.Description = record.Description;
+                recordfromdb.Name = record.Name;
+                recordfromdb.ThemeName = record.ThemeName;
+                if(recordfromdb.ImageLink == null)
+               recordfromdb.ImageLink = await CreateImageForRecord(record);
+               Recordcontext.Records.Update(recordfromdb);
+                await Recordcontext.SaveChangesAsync();
+                await UpdateSteps(StepName, Text, recordfromdb);
+                await UpdateTags(recordfromdb, Tags);
+                return Redirect("/home");
+            }
+            return Redirect("~/Identity/Account/Login");
+
+        }
+
+        }
+
+        [HttpPost]
+        public  void DelStepFromDB(int StepID)
+        {
+            StepsIdForDelete.Add(StepID);
+        }
+
+        [HttpPost]
+        public void DelPhotoFromDB(int ID, bool IsRecord)
+        {
+            if (IsRecord)
+            {DeleteRecordPhoto(ID);}
+           // else {DeleteStepPhoto(ID);}
+            Recordcontext.SaveChangesAsync();
+        }
+
+        public void DeleteRecordPhoto(int ID)
+        {
+            Record record = Recordcontext.Records.Where(a => a.RecordID == ID).FirstOrDefault();
+            if (record != null)
+            {
+                record.ImageLink = null;
+                Recordcontext.Records.Update(record);
+            }
+        }
+
+        public void DeleteStepPhoto(int ID)
+        {
+            Step step = Recordcontext.Steps.Where(a => a.StepID == ID).FirstOrDefault();
+            if (step != null)
+            {
+               // step.ImageLink = null;
+                Recordcontext.Steps.Update(step);
+            }
+        }
+
+        public async Task UpdateSteps(List<string> StepName, List<string> Text, Record record)
+        {
+            for(int i=0; i<StepsIdForUpdate.Count;i++)
+            {
+                Step step = Recordcontext.Steps.Where(a => a.StepID == StepsIdForUpdate.ElementAt(i)).FirstOrDefault();
+                if (StepsIdForDelete.Contains(StepsIdForUpdate.ElementAt(i)))
+                {
+                    Recordcontext.Steps.Remove(step);
+                }
+                else
+                {
+                    step.StepName = StepName.ElementAt(i);
+                    step.Text = Text.ElementAt(i);
+                    Recordcontext.Steps.Update(step);
+                }
+            }
+            int CountDefaultSteps = StepsIdForUpdate.Count - StepsIdForDelete.Count;
+            for (int i = CountDefaultSteps; i < StepName.Count; i++)
+            {
+                Step step = new Step
+                {
+                    Text = Text.ElementAt(i),
+                    StepName = StepName.ElementAt(i),
+                    RecordID = record
+                };
+                Recordcontext.Steps.Add(step);
+
+            }
+            await Recordcontext.SaveChangesAsync();
+        }
+        public async Task UpdateTags(Record record, string Tags)
+        {
+            Tags = Tags.Replace(",", String.Empty);
+            List<string> TagsList = Tags.Split("#").ToList();
+            TagsList.Remove("");
+            int u = TagsList.Count() - TagsIdForUpdate.Count();
+            for (int i=0;i<TagsList.Count();i++)
+            {
+                    if (i<TagsIdForUpdate.Count())
+                    {
+                        Tag tagfromdb = Recordcontext.Tags.Where(a => a.TagID == TagsIdForUpdate.ElementAt(i)).FirstOrDefault();
+                        if ("#" + TagsList.ElementAt(i).Replace(" ", String.Empty) != tagfromdb.TagName)
+                        {
+                            tagfromdb.TagName = "#" + TagsList.ElementAt(i).Replace(" ", String.Empty);
+                            Recordcontext.Tags.Update(tagfromdb);
+                        }
+                    }
+                    else
+                    {
+                        Tag tag = new Tag
+                        {
+                            Record = record,
+                            TagName = "#" + TagsList.ElementAt(i).Replace(" ", String.Empty)
+                        };
+                        Recordcontext.Tags.Add(tag);
+                    }
+            }
+            if (u < 0)
+            {
+                for(int i=TagsList.Count(); i < TagsIdForUpdate.Count(); i++)
+                {
+                    Tag TagForDelete = Recordcontext.Tags.Where(a => a.TagID == TagsIdForUpdate.ElementAt(i)).FirstOrDefault();
+                    Recordcontext.Tags.Remove(TagForDelete);
+                }
+            }
+            await Recordcontext.SaveChangesAsync();
+        }
+        
+      
+
         private async Task<string> CreateImageForRecord(Record record)
         {
             string link=await UploadFile(MainFile.Name,MainFileName);
@@ -206,32 +390,6 @@ namespace Instructions.Controllers
         {
             int index = filePaths.FindIndex(a => a.id == int.Parse(id) && a.filename == filename);
             filePaths.RemoveAt(index);
-        }
-
-
-        [HttpPost]
-        public async Task<ActionResult> Delete(string[] selected)
-        {
-            if (selected != null)
-            {
-                foreach (var id in selected)
-                {
-                    var record = await Recordcontext.Records.FindAsync(Int32.Parse(id));
-                    
-                    
-                    if (record != null)
-                    {
-                        List<Step> steps = Recordcontext.Steps.Where(a => a.RecordID == record).ToList();
-                        foreach(var step in steps)
-                        {
-                            Recordcontext.Steps.Remove(step);
-                        }
-                        Recordcontext.Records.Remove(record);
-                        await Recordcontext.SaveChangesAsync();
-                    }
-                }
-            }
-            return Redirect("~/Identity/Account/Manage/PersonalInstructions");
         }
 
 

@@ -1,0 +1,154 @@
+﻿@using Instructions.Models
+
+@model Instructions.Models.Record
+
+@{
+    ViewData["Title"] = "RecordEdit";
+}
+<script src="~/lib/dropzone/dropzone.js"></script>
+<h2>RecordEdit</h2>
+<form asp-action="Update" asp-controller="records">
+    <div class="form-group">
+        <label asp-for="Name" class="control-label">Name</label>
+        <input required type="text" asp-for="Name" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Description" class="control-label">Description</label>
+        <input required type="text" asp-for="Description" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ThemeName" class="control-label">Theme name</label>
+        <select asp-for="ThemeName" class="form-control">
+            @foreach (Theme theme in ViewBag.Themes)
+            {
+                <option>@theme.Themes</option>
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label class="control-label">Tags</label>
+        <input id="tag" type="text" class="form-control" name="Tags" value="@ViewData["TagsList"]" />
+    </div>
+   
+    <h3>Photos</h3>
+    <div class="container">
+        <div id="RecordPhoto"></div>
+    </div>
+    @if (Model.ImageLink != null)
+    {
+        <script type="text/javascript">
+            $.ajax({
+        url: '/Records/Photo',
+                type: 'POST',
+                data: { Id: @Model.RecordID, Link: "@Model.ImageLink", IsRecord: true},
+                dataType: "html",
+            })
+                .done(function (result) {
+                    $('#RecordPhoto').append(result);
+        }).fail(function (xhr) {
+            console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+        })
+        </script>
+    }
+    <div class="clsbox-1" runat="server">
+        <div class="dropzone clsbox" id="UploadFormRecord">
+
+        </div>
+    </div>
+    <br />
+    <div class="container">
+        <div id="Steps"></div>
+    </div>
+
+    @foreach (Step step in ViewBag.Steps)
+    {
+        <script type="text/javascript">
+            $.ajax({
+        url: '/Records/NewStep',
+                type: 'POST',
+                cache: false,
+                async: false,
+                data: { "stepId":@step.StepID},
+                dataType: "html",
+            })
+                .done(function (result) {
+                    $('#Steps').append(result);
+        }).fail(function (xhr) {
+            console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+        })
+        </script>
+    }
+    <center>
+        <input id="add" type="button" class="btn btn-default" value="Add new step" />
+    </center>
+    <br />
+
+    <center>
+        <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-default" />
+        </div>
+    </center>
+</form>
+<script type="text/javascript">
+    $(function () {
+        var items = JSON.parse('@ViewBag.Tags');
+        function split(val) {
+            return val.split(/ \s*/);
+        }
+        function extractLast(term) {
+            return split(term).pop();
+        }
+
+        $("#tag").
+            autocomplete({
+                minLength: 0,
+                source: function (request, response) {
+                    response($.ui.autocomplete.filter(
+                        items, extractLast(request.term)));
+                },
+                focus: function () {
+                    return false;
+                },
+                select: function (event, ui) {
+                    var terms = split(this.value);
+                    terms.pop();
+                    terms.push(ui.item.value);
+                    terms.push("");
+                    this.value = terms.join(" ");
+                    return false;
+                }
+            });
+    });
+</script>
+<script type="text/javascript">
+    $('#add').on('click', function (e) {
+
+        Add();
+    });
+    function Add() {
+        $.ajax({
+            url: '/Records/NewStep',
+            type: 'POST',
+            cache: false,
+            async: true,
+            dataType: "html",
+        })
+            .done(function (result) {
+                $('#Steps').append(result);
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })
+    };
+</script>
+<script type="text/javascript">
+    Dropzone.autoDiscover = false;
+    var myDropzone = new Dropzone("div#UploadFormRecord", {
+        url: "/Records/UploadFiles",
+        maxFiles: 1,
+        maxfilesexceeded: function (file) {
+            alert("Only one file here");
+            this.removeFile(file);
+        }
+    });
+
+</script>

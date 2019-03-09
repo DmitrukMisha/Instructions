@@ -30,6 +30,7 @@ namespace Instructions.Areas.Identity.Pages.Account.Manage
     public async Task<IActionResult> OnGet()
         {
             var user = await _userManager.GetUserAsync(User);
+            ViewData["EmailConfirm"] = user.EmailConfirmed;
             Records =  _context.Records.Where(a => a.USerID == user.Id ).ToList();
             if (user == null)
             {

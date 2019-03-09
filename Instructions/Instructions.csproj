@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="jQuery.RateIt" Version="1.1.1" />
     <PackageReference Include="HtmlAgilityPack" Version="1.9.1" />
     <PackageReference Include="IronPdf" Version="5.0.5.2" />
     <PackageReference Include="jQuery.UI.Combined" Version="1.12.1" />

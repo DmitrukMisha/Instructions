@@ -34,20 +34,22 @@
 
         </div>
     </div>
-    <br />  
+    <br />
+    <div class="container">
+        <div id="Steps"></div>
+    </div>
+
+<center>
+    <input id="add" type="button" class="btn btn-default" value="Add new step" />
+</center>
+    <br />
     <center>
         <div class="form-group">
             <input type="submit" value="Create new record" class="btn btn-default" />
         </div>
     </center>
-    <div class="container">
-        <div id="Steps"></div>
-     </div>
 </form>
-<center>
-    <input id="add" type="button" class="btn btn-primary" value="Add new step" />
-</center>
-<script type="text/javascript">
+    <script type="text/javascript">
     $(function () {
         var items = JSON.parse('@ViewBag.Tags');
         function split(val) {
@@ -77,35 +79,36 @@
                 }
             });
     });
-</script>
-<script type="text/javascript">
-    $('#add').on('click', function (e) {
+    </script>
+    <script type="text/javascript">
+        $('#add').on('click', function (e) {
 
-        Add();
-    });
-    function Add() {
-        $.ajax({
-            url: '/Records/NewStep',
-            type: 'POST',
-            cache: false,
-            async: true,
-            dataType: "html",
-        })
-            .done(function (result) {
-                $('#Steps').append(result);
-            }).fail(function (xhr) {
-                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            Add();
+        });
+        function Add() {
+            $.ajax({
+                url: '/Records/NewStep',
+                type: 'POST',
+                cache: false,
+                async: true,
+                dataType: "html",
             })
-    };
-</script>
-<script type="text/javascript">
-    Dropzone.autoDiscover = false;
-    var myDropzone = new Dropzone("div#UploadFormRecord", {
-        url: "Records/UploadFiles",
-        maxFiles: 1,
-        maxfilesexceeded: function (file) {
-            alert("Only one file here");
-            this.removeFile(file);
-        } });
-    
-</script>
+                .done(function (result) {
+                    $('#Steps').append(result);
+                }).fail(function (xhr) {
+                    console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+                })
+        };
+    </script>
+    <script type="text/javascript">
+        Dropzone.autoDiscover = false;
+        var myDropzone = new Dropzone("div#UploadFormRecord", {
+            url: "Records/UploadFiles",
+            maxFiles: 1,
+            maxfilesexceeded: function (file) {
+                alert("Only one file here");
+                this.removeFile(file);
+            }
+        });
+
+    </script>

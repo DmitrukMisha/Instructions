@@ -4,14 +4,16 @@ using Instructions.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Instructions.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190309172415_Mark")]
+    partial class Mark
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,9 +48,13 @@ namespace Instructions.Data.Migrations
 
                     b.Property<string>("Link");
 
+                    b.Property<int?>("RecordID1");
+
                     b.Property<int?>("StepID1");
 
                     b.HasKey("ImageID");
+
+                    b.HasIndex("RecordID1");
 
                     b.HasIndex("StepID1");
 
@@ -344,6 +350,10 @@ namespace Instructions.Data.Migrations
 
             modelBuilder.Entity("Instructions.Models.Image", b =>
                 {
+                    b.HasOne("Instructions.Models.Record", "RecordID")
+                        .WithMany()
+                        .HasForeignKey("RecordID1");
+
                     b.HasOne("Instructions.Models.Step", "StepID")
                         .WithMany()
                         .HasForeignKey("StepID1");

@@ -1,6 +1,18 @@
 ﻿@model Instructions.Models.Step
-
+@{
+    if (Model == null)
+    {
+        ViewData["Update"] = "false";
+        ViewData["StepID"] = "Unexpected";
+    }
+    else
+    {
+        ViewData["Update"] = "true";
+        ViewData["StepID"] = Model.StepID;
+    }
+}
 <div class="myclass">
+    <br />
     <h4>Step</h4>
     <hr />
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -9,20 +21,30 @@
         <input required asp-for="StepName" class="form-control" />
         <span asp-validation-for="StepName" class="text-danger"></span>
     </div>
+
+
     <div class="form-group">
         <label asp-for="Text" class="control-label"></label>
-        <textarea required asp-for="Text" rows="5" class="form-control" />
+        <textarea required asp-for="Text" rows="5" class="form-control"></textarea>
         <span asp-validation-for="Text" class="text-danger"></span>
     </div>
     <div class="clsbox-1" runat="server">
         <div class="dropzone clsbox step-@ViewData["id"] " id="UploadFormStep">
-
+      
         </div>
     </div>
     <button type="button" class="btn btn-danger del-step" commid="@ViewData["id"]">Delete step</button>
 </div>
 <script type="text/javascript">
     $(".del-step").click(function () {
+        var x = @ViewData["Update"];
+        if (x) {
+            $.ajax({
+                url: '/Records/DelStepFromDB',
+                type: 'POST',
+                data: "StepID=" + @ViewData["StepID"],
+            });
+        }
         $.ajax({
             url: '/Records/RemoveStepIdFromList',
             type: 'POST',
@@ -51,7 +73,7 @@
             async: true,
             data: { "id": @ViewData["id"], "filename": file.name },
             dataType: "html"
-   
+
         })
             .fail(function (xhr) {
                 console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
