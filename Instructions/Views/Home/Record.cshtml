@@ -22,6 +22,20 @@
 </div>
 
 
+@if ((User.Identity.Name != null) && ((bool)ViewData["Role"] || User.Identity.Name == (string)ViewData["Name"]))
+{
+    if ((bool)ViewData["EmailConfirmed"])
+    {
+        <form method="post">
+        <button type="submit" asp-controller="Home" asp-action="DeleteRecord" asp-route-selected="@ViewData["RecordID"]" class="btn btn-sm btn-danger"> Delete record</button>
+        </form>
+    }
+    else
+    {
+        <p class="col-md-4">Confirm email to delete records</p>
+    }
+}
+
 <hr />
 <div class="row">
     <div class="col-md-10">
@@ -185,6 +199,7 @@
 
 </script>
 
+
 <script type="text/javascript">
     $(document).ready(function () { $(".image").fancybox(); });
 </script>
@@ -212,3 +227,4 @@
         $('#value6').text('You\'ve rated it: ' + value);
     });
 </script>
+

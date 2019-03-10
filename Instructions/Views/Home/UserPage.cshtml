@@ -14,11 +14,11 @@
             }
         </select>
     </div>
-    @if ((User.Identity.Name!=null)&&((bool)ViewData["Role"] || User.Identity.Name==(string)ViewData["Name"]))
+    @if ((User.Identity.Name != null) && ((bool)ViewData["Role"] || User.Identity.Name == (string)ViewData["Name"]))
     {
         if ((bool)ViewData["Email"])
         {
-    <a asp-controller="Records" asp-action="Index" asp-route-userID="@ViewData["id"]" class="col-md-4">Create new record</a>
+            <a asp-controller="Records" asp-action="Index" asp-route-userID="@ViewData["id"]" class="col-md-4">Create new record</a> 
         }
         else
         {

@@ -3,6 +3,7 @@
 
 @foreach (Record item in Model)
 {
+
     <div class="jumbotron">
         <p class="display-3" align="center"> <a asp-controller="Home" asp-action="Record" asp-route-id="@item.RecordID">@item.Name</a></p>
         <div class="row">
@@ -31,8 +32,25 @@
                 <img src="@item.ImageLink" class="img-fluid center-block" height="200" style="width:auto"/>}
             <hr />
         </center>
-
-        <p><font color="gray" size="2">@ViewData[item.RecordID.ToString()] </font></p>
+        <div class="col-md-2" align="right">
+            <p>
+                <font color="gray" size="2"><a asp-controller="Search" asp-route-TextSearchInput="@item.ThemeName" asp-action="Index">@item.ThemeName</a></font>
+            </p>
+        </div>
     </div>
+    <hr />
+    <div color="gray">@Westwind.AspNetCore.Markdown.Markdown.ParseHtmlString(item.Description)</div>
+    <hr />
+    <center>
+        @if (item.ImageLink == null || item.ImageLink == String.Empty)
+        {<img src="~/images/no_photo.png" alt="no image" class="img-fluid center-block" /> }
+        else
+        {
+            <img src="@item.ImageLink" class="img-fluid center-block" />}
+        <hr />
+    </center>
 
+    <p><font color="gray" size="2">@Html.Encode(@ViewData[item.RecordID.ToString()]) </font></p>
+</div>
+}
 }

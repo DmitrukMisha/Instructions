@@ -7,9 +7,9 @@
 <div class="jumbotron">
     @foreach (string tagName in ViewBag.TagsNames)
     {
-        <div style="background-color:cornflowerblue; border-radius:15px;  padding:5px; padding-left:10px; padding-right:10px; display: inline-block;">
-            @tagName
-        </div>
+    <div style="background-color:azure; border-radius:15px;  padding:5px; padding-left:10px; padding-right:10px; display: inline-block;">
+        <a asp-controller="Search" asp-route-TextSearchInput="@tagName" asp-action="Index">@tagName</a>
+    </div>
     }
 
 </div>
