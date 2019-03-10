@@ -50,17 +50,37 @@ namespace Instructions.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult RecordsView()
+        public IActionResult RecordsView(bool latest=true, bool update=false)
         {
+            if (update)
+            {
+                count = DbContext.Records.Count();
+                taken = 10;
+            }
             if (count < 10)
                 taken = count;
             count -= taken;
-            List<Record> records = DbContext.Records.ToList().GetRange(count,taken);             
+            List<Record> records=new List<Record>();
+            if (latest)
+            {
+                records = DbContext.Records.ToList().GetRange(count, taken);
+               
+            }
+            else
+                records = DbContext.Records.OrderBy(r => r.Raiting).ToList().GetRange(count,taken);
             records.Reverse();
+            List<string> raiting = new List<string>();
+            foreach (Record record in records)
+            {
+                raiting.Add(GetRating(record.RecordID.ToString()));
+            }
+            ViewBag.Raiting = raiting;
             GetTags(records);
             AuthorDataView(records);
             return PartialView(records);
         }
+
+       
         public List<string> GenerateTagsCloudValues()
         {
             List<string> TagsCloudValues = new List<string>();
@@ -277,6 +297,16 @@ namespace Instructions.Controllers
             return RedirectToAction("Comments");
         }
 
+        public async Task UpdateRecordRaiting(Record record)
+        {
+            List<Mark> marks = DbContext.Marks.Where(a => a.RecordID == record).ToList();
+            int count = marks.Count;
+            double sum = marks.Sum(a=>a.MarkValue);
+            record.Raiting = sum / count;
+            DbContext.Records.Update(record);
+            await DbContext.SaveChangesAsync();
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddMark(string value, int id)
         {
@@ -295,7 +325,9 @@ namespace Instructions.Controllers
                 mark.MarkValue = doubleValue;
                 DbContext.Marks.Update(mark);
             }
+
             await DbContext.SaveChangesAsync();
+            await UpdateRecordRaiting(record);
 
             return Json(GetRating(id.ToString())) ;
         }
