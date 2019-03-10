@@ -14,6 +14,14 @@
 
 </div>
 <div class="row justify-content-center">
+    <h3> Themes: </h3>
+    <select id="Themes" name="Themes" class="form-control col-md-3">
+        <option>-</option>
+        @foreach (string s in ViewBag.Themes)
+        {
+            <option>@s</option>
+        }
+    </select> 
     <h3> Filter:   </h3>
     <select id="Filter" name="Filter" class="form-control col-md-2">
 
@@ -30,6 +38,7 @@
 </script>
 <script type="text/javascript">
     var latest = true, update = true;
+    var theme="-";
     $("#Filter").change(function () {
         if ($("#Filter option:selected").val() == "New") {
             latest = true;
@@ -42,13 +51,21 @@
         $("#Records").empty();
         GetMore();
     });
+    $("#Themes").change(function () {
+        update = true;
+        theme = $("#Themes option:selected").val();
+        $("#Records").empty();
+        GetMore();
+
+
+    });
     function GetMore() {
         $.ajax({
             url: '/Home/RecordsView',
             type: 'POST',
             cache: false,
             async: true,
-            data: { "latest": latest, "update": update },
+            data: { "latest": latest, "update": update, "theme": theme },
             dataType: "html",
         })
             .done(function (result) {

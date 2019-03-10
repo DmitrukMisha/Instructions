@@ -43,26 +43,31 @@ namespace Instructions.Controllers
             List<Record> records = DbContext.Records.ToList();      
             count= DbContext.Records.Count();
             taken = 10;
-
+            ViewBag.Themes = DbContext.Themes.Select(a => a.Themes).ToList();
             user = _userManager.GetUserAsync(User).Result;
             return View();
         }
         [HttpPost]
-        public IActionResult RecordsView(bool latest=true, bool update=false)
+        public IActionResult RecordsView(string theme="-", bool latest=true, bool update=false)
         {
+            List<Record> records = new List<Record>();
+            if (theme == "-")
+                records = DbContext.Records.ToList();
+            else
+                records = DbContext.Records.Where(a => a.ThemeName == theme).ToList();
             if (update)
             {
-                count = DbContext.Records.Count();
+                count = records.Count();
                 taken = 10;
             }
             if (count < 10)
                 taken = count;
             count -= taken;
-            List<Record> records=new List<Record>();
+            
             if (latest)
-                records = DbContext.Records.ToList().GetRange(count, taken);               
+                records =records.GetRange(count, taken);               
             else
-                records = DbContext.Records.OrderBy(r => r.Raiting).ToList().GetRange(count,taken);
+                records = records.OrderBy(r => r.Raiting).ToList().GetRange(count,taken);
             records.Reverse();          
             ViewBag.Raiting =GetRaiting(records);
             GetTags(records);
