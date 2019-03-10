@@ -18,5 +18,6 @@ namespace Instructions.Models
         public string Description { get; set; }
         public string ThemeName { get; set; }
         public string ImageLink { get; set; }
+        public double Raiting { get; set; }
     }
 }

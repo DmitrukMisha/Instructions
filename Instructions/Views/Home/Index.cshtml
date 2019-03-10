@@ -3,48 +3,82 @@
 }
 
 <br />
+
 <div class="jumbotron">
     @foreach (string tagName in ViewBag.TagsNames)
     {
         <div style="background-color:cornflowerblue; border-radius:15px;  padding:5px; padding-left:10px; padding-right:10px; display: inline-block;">
-          @tagName
+            @tagName
         </div>
     }
+
 </div>
+<div class="row justify-content-center">
+    <h3> Themes: </h3>
+    <select id="Themes" name="Themes" class="form-control col-md-3">
+        <option>-</option>
+        @foreach (string s in ViewBag.Themes)
+        {
+            <option>@s</option>
+        }
+    </select> 
+    <h3> Filter:   </h3>
+    <select id="Filter" name="Filter" class="form-control col-md-2">
 
-
+        <option>New</option>
+        <option>Rated</option>
+    </select>
+</div>
 <div id="Records"></div>
 <center>
     <input type="button" id="AddMore" class="btn btn-default" value="Get more records" />
 </center>
 <script type="text/javascript">
-    $('#AddMore').on('click', function (e) {
+
+</script>
+<script type="text/javascript">
+    var latest = true, update = true;
+    var theme="-";
+    $("#Filter").change(function () {
+        if ($("#Filter option:selected").val() == "New") {
+            latest = true;
+        }
+        else {
+            latest = false;
+
+        }
+        update = true;
+        $("#Records").empty();
+        GetMore();
+    });
+    $("#Themes").change(function () {
+        update = true;
+        theme = $("#Themes option:selected").val();
+        $("#Records").empty();
+        GetMore();
+
+
+    });
+    function GetMore() {
         $.ajax({
             url: '/Home/RecordsView',
             type: 'POST',
             cache: false,
             async: true,
+            data: { "latest": latest, "update": update, "theme": theme },
             dataType: "html",
         })
             .done(function (result) {
                 $('#Records').append(result);
+                update = false;
             }).fail(function (xhr) {
                 console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
             })
-    });
-</script>
-<script type="text/javascript">
+    };
     $(document).ready(function () {
-        $.ajax({
-            url: '/Home/RecordsView',
-            type: 'POST',
-            cache: false,
-            async: true,
-            dataType: "html",
-        })
-        .done(function (result) {
-            $('#Records').append(result);
-        }).fail(function (xhr) {
-            console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
-        }) });
+        GetMore();
+    });
+    $('#AddMore').on('click', function (e) {
+        GetMore();
+    });
 </script>

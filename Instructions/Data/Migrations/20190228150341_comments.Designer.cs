@@ -11,7 +11,7 @@ namespace Instructions.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20190228150341_comments")]
-    partial class comments
+    partial class Comments
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

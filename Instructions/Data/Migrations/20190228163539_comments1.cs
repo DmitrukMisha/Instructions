@@ -2,7 +2,7 @@
 
 namespace Instructions.Data.Migrations
 {
-    public partial class comments1 : Migration
+    public partial class Comments1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
