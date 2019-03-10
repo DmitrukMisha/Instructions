@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Instructions.Data;
 using Instructions.Models;
 using Korzh.EasyQuery.Linq;
@@ -20,19 +21,9 @@ namespace Instructions.Controllers
               dbContext = context;
         }
 
-        //[HttpGet]
-        //    public IActionResult Index(string TextSearchInput)
-        //    {
-        //    List<Record> records = dbContext.Records.ToList();
-        //    AuthorDataView(records);
-        //    var model = new SearchViewModel
-        //    {
-        //        Records = dbContext.Records
-        //    };
-        //        return View(model);
-        //    }
 
-        [HttpPost]
+
+       
         public IActionResult Index(string TextSearchInput)
         {
             SearchViewModel model = new SearchViewModel
@@ -40,19 +31,16 @@ namespace Instructions.Controllers
                 Success = true,
                 Text = TextSearchInput
             };
-            //  model.Records = dbContext.Records;
-            // model.Users = dbContext.Users;
-            // model.Steps = dbContext.Steps;
             List<Record> records = dbContext.Records.ToList();
             AuthorDataView(records);
-
+            GetTags(records);
             if (!string.IsNullOrEmpty(model.Text))
             {
                 model.Records = dbContext.Records.FullTextSearchQuery(model.Text);
-                model.Users= dbContext.Users.FullTextSearchQuery(model.Text);
                 model.Steps = dbContext.Steps.FullTextSearchQuery(model.Text);
-
-                if(model.Records==null & model.Users==null & model.Steps==null) model.Success = false;
+                model.Tags = dbContext.Tags.FullTextSearchQuery(model.Text);
+               
+                if (model.Records==null & model.Tags==null & model.Steps==null) model.Success = false;
             }else
             {
                 model.Success = false;
@@ -66,6 +54,18 @@ namespace Instructions.Controllers
             foreach (Record record in records)
             {
                 ViewData["author" + record.RecordID.ToString()] = GetAuthorName(record);
+            }
+        }
+
+        public void GetTags(List<Record> records)
+        {
+            foreach (Record record in records)
+            {
+                var tags = dbContext.Tags.Where(a => a.Record == record).Select(p => p.TagName).ToList();
+                var sb = new StringBuilder();
+                tags.ForEach(s => sb.Append(s));
+                var combinedList = sb.ToString();
+                ViewData[record.RecordID.ToString()] = combinedList;
             }
         }
 

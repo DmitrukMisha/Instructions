@@ -80,7 +80,6 @@ namespace Instructions.Controllers
             foreach(Step step in steps)
             {
                 StepsIdForUpdate.Add(step.StepID);
-                activeSteps.Add(step.StepID);
             }
             id = StepsIdForUpdate.Max();
             return View(record);
@@ -101,14 +100,18 @@ namespace Instructions.Controllers
         public IActionResult NewStep(string stepId)
         {
             id++;
-            activeSteps.Add(id);
-            ViewData["id"] = id;
+            
             if (stepId == null)
             {
+                activeSteps.Add(id);
+                ViewData["id"] = id;
                 return PartialView();
             }
             else
-            {
+            { 
+                ViewBag.Images = Recordcontext.Images.Where(a => a.StepID.StepID == Int32.Parse(stepId)).ToList();
+                activeSteps.Add(Int32.Parse(stepId));
+                ViewData["id"] = stepId;
                 Step step = Recordcontext.Steps.Where(a => a.StepID == int.Parse(stepId)).FirstOrDefault();
                 return PartialView(step);
             }
@@ -129,7 +132,6 @@ namespace Instructions.Controllers
         public void RemoveStepIdFromList(int id)
         {
             activeSteps.Remove(id);
-
         }
 
         public async Task CreateSteps(List<string> StepName, List<string> Text, Record record)
@@ -157,32 +159,36 @@ namespace Instructions.Controllers
         public async Task<int> CreateImagesForStep(List<FilePath> filePaths, Step step, int id)
         {
             int idnew = id;
-            int index;
+            int index = -1;
             int maxId = filePaths.Max(a => a.id);
             if (!activeSteps.Contains(idnew))
                 do
                 {
-                    index = filePaths.FindIndex(x => x.id == idnew);
-                    if (index == -1) idnew++;
+
+                    if (index == -1)
+                    {
+                        idnew++;
+                        index = filePaths.FindIndex(x => x.id == idnew);
+                    }
                 }
-                while (index == -1 && idnew <= maxId&&!activeSteps.Contains(idnew));
+                while (index == -1 && idnew <= maxId && !activeSteps.Contains(idnew));
             else { index = filePaths.FindIndex(x => x.id == idnew); }
             if (idnew > maxId) return -1;
-            if (!(index==-1)) 
-            while (index<filePaths.Count&&filePaths.ElementAt(index).id == idnew) 
-            {
-                string link=await UploadFile(filePaths.ElementAt(index).path, filePaths.ElementAt(index).filename);
+            if (!(index == -1))
+                while (index < filePaths.Count && filePaths.ElementAt(index).id == idnew)
+                {
+                    string link = await UploadFile(filePaths.ElementAt(index).path, filePaths.ElementAt(index).filename);
                     if (link != null)
                     {
                         Image image = new Image { StepID = step, Link = link };
-                        Recordcontext.Images.Add(image);                   
-                         await Recordcontext.SaveChangesAsync();
+                        Recordcontext.Images.Add(image);
+                        await Recordcontext.SaveChangesAsync();
                     }
                     index++;
-            }
+                }
             idnew++;
             return idnew;
-            
+
         }
 
         public async Task CreateTags(Record record , string Tags)
@@ -252,40 +258,17 @@ namespace Instructions.Controllers
         {
             StepsIdForDelete.Add(StepID);
         }
-
-        [HttpPost]
-        public void DelPhotoFromDB(int ID, bool IsRecord)
-        {
-            if (IsRecord)
-            {DeleteRecordPhoto(ID);}
-           // else {DeleteStepPhoto(ID);}
-            Recordcontext.SaveChangesAsync();
-        }
-
-        public void DeleteRecordPhoto(int ID)
-        {
-            Record record = Recordcontext.Records.Where(a => a.RecordID == ID).FirstOrDefault();
-            if (record != null)
-            {
-                record.ImageLink = null;
-                Recordcontext.Records.Update(record);
-            }
-        }
-
-        public void DeleteStepPhoto(int ID)
-        {
-            Step step = Recordcontext.Steps.Where(a => a.StepID == ID).FirstOrDefault();
-            if (step != null)
-            {
-               // step.ImageLink = null;
-                Recordcontext.Steps.Update(step);
-            }
-        }
+        
 
         public async Task UpdateSteps(List<string> StepName, List<string> Text, Record record)
         {
-            for(int i=0; i<StepsIdForUpdate.Count;i++)
+            List<FilePath> filePathsSorted = new List<FilePath>();
+            if (filePaths != null)
+                filePathsSorted = (from filepath in filePaths orderby filepath.id select filepath).ToList();
+            int index = 1;
+            for (int i=0; i<StepsIdForUpdate.Count;i++)
             {
+               
                 Step step = Recordcontext.Steps.Where(a => a.StepID == StepsIdForUpdate.ElementAt(i)).FirstOrDefault();
                 if (StepsIdForDelete.Contains(StepsIdForUpdate.ElementAt(i)))
                 {
@@ -296,6 +279,8 @@ namespace Instructions.Controllers
                     step.StepName = StepName.ElementAt(i);
                     step.Text = Text.ElementAt(i);
                     Recordcontext.Steps.Update(step);
+                    if (index != -1 && filePathsSorted.Count != 0)
+                        index = await CreateImagesForStep(filePathsSorted, step, index);
                 }
             }
             int CountDefaultSteps = StepsIdForUpdate.Count - StepsIdForDelete.Count;
@@ -308,19 +293,24 @@ namespace Instructions.Controllers
                     RecordID = record
                 };
                 Recordcontext.Steps.Add(step);
-
+                if (index != -1 && filePathsSorted.Count != 0)
+                    index = await CreateImagesForStep(filePathsSorted, step, index);
             }
+            
             await Recordcontext.SaveChangesAsync();
+            
         }
         public async Task UpdateTags(Record record, string Tags)
         {
-            Tags = Tags.Replace(",", String.Empty);
-            List<string> TagsList = Tags.Split("#").ToList();
-            TagsList.Remove("");
-            int u = TagsList.Count() - TagsIdForUpdate.Count();
-            for (int i=0;i<TagsList.Count();i++)
+            if (Tags != null)
             {
-                    if (i<TagsIdForUpdate.Count())
+                Tags = Tags.Replace(",", String.Empty);
+                List<string> TagsList = Tags.Split("#").ToList();
+                TagsList.Remove("");
+                int u = TagsList.Count() - TagsIdForUpdate.Count();
+                for (int i = 0; i < TagsList.Count(); i++)
+                {
+                    if (i < TagsIdForUpdate.Count())
                     {
                         Tag tagfromdb = Recordcontext.Tags.Where(a => a.TagID == TagsIdForUpdate.ElementAt(i)).FirstOrDefault();
                         if ("#" + TagsList.ElementAt(i).Replace(" ", String.Empty) != tagfromdb.TagName)
@@ -338,16 +328,17 @@ namespace Instructions.Controllers
                         };
                         Recordcontext.Tags.Add(tag);
                     }
-            }
-            if (u < 0)
-            {
-                for(int i=TagsList.Count(); i < TagsIdForUpdate.Count(); i++)
-                {
-                    Tag TagForDelete = Recordcontext.Tags.Where(a => a.TagID == TagsIdForUpdate.ElementAt(i)).FirstOrDefault();
-                    Recordcontext.Tags.Remove(TagForDelete);
                 }
+                if (u < 0)
+                {
+                    for (int i = TagsList.Count(); i < TagsIdForUpdate.Count(); i++)
+                    {
+                        Tag TagForDelete = Recordcontext.Tags.Where(a => a.TagID == TagsIdForUpdate.ElementAt(i)).FirstOrDefault();
+                        Recordcontext.Tags.Remove(TagForDelete);
+                    }
+                }
+                await Recordcontext.SaveChangesAsync();
             }
-            await Recordcontext.SaveChangesAsync();
         }
         
       

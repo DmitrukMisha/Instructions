@@ -4,16 +4,40 @@
     {
         ViewData["Update"] = "false";
         ViewData["StepID"] = "Unexpected";
+        ViewData["MaxFiles"] = 3;
     }
     else
     {
         ViewData["Update"] = "true";
         ViewData["StepID"] = Model.StepID;
+        ViewData["MaxFiles"] = 3 - ViewBag.Images.Count();
     }
 }
 <div class="myclass">
     <br />
     <h4>Step</h4>
+    @if (ViewData["Update"].ToString() == "true")
+    {
+        foreach (Image image in ViewBag.Images)
+        {
+            <script type="text/javascript">
+            $.ajax({
+             url: '/Records/Photo',
+                type: 'POST',
+                 data: { Id: @image.ImageID, Link: "@image.Link", IsRecord: false},
+                dataType: "html",
+                })
+                .done(function (result) {
+                $('#StepPhoto-@Model.StepID').append(result);
+                }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+                })
+            </script>
+        }
+        <div id="StepPhoto-@Model.StepID"></div>
+    }
+
+
     <hr />
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="form-group">
@@ -30,7 +54,7 @@
     </div>
     <div class="clsbox-1" runat="server">
         <div class="dropzone clsbox step-@ViewData["id"] " id="UploadFormStep">
-      
+
         </div>
     </div>
     <button type="button" class="btn btn-danger del-step" commid="@ViewData["id"]">Delete step</button>
@@ -59,7 +83,7 @@
     var el = "div.step-"+@ViewData["id"];
     var myDropzone = new Dropzone(el, {
         url: "/Records/UploadFilesFromStep",
-        maxFiles: 3,
+        maxFiles: @ViewData["MaxFiles"],
         maxfilesexceeded: function (file) {
             alert("Max 3 files here");
             this.removeFile(file);
@@ -88,11 +112,11 @@
             async: true,
             data: { "id": @ViewData["id"], "filename": file.name },
             dataType: "html"
-   
+
         })
             .fail(function (xhr) {
                 console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
             })
        // formData.append('userName', 'bob');
-    }); 
+    });
 </script>

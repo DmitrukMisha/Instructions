@@ -44,7 +44,19 @@
         $('#value6').text('You\'ve rated it: ' + value);
     });
 </script>
-
+@if ((User.Identity.Name != null) && ((bool)ViewData["Role"] || User.Identity.Name == (string)ViewData["Name"]))
+{
+    if ((bool)ViewData["EmailConfirmed"])
+    {
+        <form method="post">
+        <button type="submit" asp-controller="Home" asp-action="DeleteRecord" asp-route-selected="@ViewData["RecordID"]" class="btn btn-sm btn-danger"> Delete record</button>
+        </form>
+    }
+    else
+    {
+        <p class="col-md-4">Confirm email to delete records</p>
+    }
+}
 <hr />
 <div class="row">
     <div class="col-md-10">
@@ -70,8 +82,8 @@
                     <h1>@Model.ElementAt(0).StepName</h1>
                     <hr />
 
-                   
-                        <div>@Markdown.ParseHtmlString(Model.ElementAt(0).Text)</div>
+
+                    <div>@Markdown.ParseHtmlString(Model.ElementAt(0).Text)</div>
 
                     <div class="row justify-content-center">
                         @if (ViewBag.images != null)
@@ -158,53 +170,53 @@
     {
         <h3>You need log in or confirm email to leave comments</h3>
     }
-    </div>
-    <script type="text/javascript">
-        $(function () {
-            $('#carousel').carousel({
-                interval: false
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('#carousel').carousel({
+            interval: false
 
-            });
         });
-    </script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $.ajax({
-                url: '/Home/Comments',
-                type: 'POST',
-                cache: false,
-                async: true,
-                dataType: "html",
+    });
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            url: '/Home/Comments',
+            type: 'POST',
+            cache: false,
+            async: true,
+            dataType: "html",
+        })
+            .done(function (result) {
+                $('#Comments').html(result);
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
             })
-                .done(function (result) {
-                    $('#Comments').html(result);
-                }).fail(function (xhr) {
-                    console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
-                })
-        });
+    });
 
-    </script>
+</script>
 
 
-    <script type="text/javascript">
-        $('#add').on('click', function (e) {
-            $.ajax({
-                url: '/Home/CreateComment',
-                type: 'POST',
-                cache: false,
-                async: true,
-                data: $('#Text').serialize(),
-                dataType: "html"
+<script type="text/javascript">
+    $('#add').on('click', function (e) {
+        $.ajax({
+            url: '/Home/CreateComment',
+            type: 'POST',
+            cache: false,
+            async: true,
+            data: $('#Text').serialize(),
+            dataType: "html"
+        })
+            .done(function (result) {
+                $('#Comments').html(result);
+                $('#Text').val("");
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
             })
-                .done(function (result) {
-                    $('#Comments').html(result);
-                    $('#Text').val("");
-                }).fail(function (xhr) {
-                    console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
-                })
-        });
+    });
 
-    </script>
-    <script type="text/javascript">
-        $(document).ready(function () { $(".image").fancybox(); });
-    </script>
+</script>
+<script type="text/javascript">
+    $(document).ready(function () { $(".image").fancybox(); });
+</script>

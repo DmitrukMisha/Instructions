@@ -333,6 +333,15 @@ namespace Instructions.Controllers
         }
 
         [HttpPost]
+        public async Task<ActionResult> DeleteRecord(string selected)
+        {
+            string[] selectedArray = new string[] { selected };
+           await DeleteRecords(selectedArray);
+            return Redirect("~/Home/Index");
+        }
+
+
+        [HttpPost]
         public async Task<ActionResult> DeleteRecords(string[] selected)
         {
             if (selected != null)
@@ -347,11 +356,17 @@ namespace Instructions.Controllers
                         List<Step> steps = DbContext.Steps.Where(a => a.RecordID == record).ToList();
                         foreach (var step in steps)
                         {
+                            List<Image> images = DbContext.Images.Where(a => a.StepID == step).ToList();
+                            foreach(Image image in images)
+                            {
+                                DeleteStepPhoto(image.ImageID);
+                            }
                             DbContext.Steps.Remove(step);
                         }
                         DeleteComments(record);
                         DeleteTags(record);
                         DeleteMarks(record);
+                       
                         DbContext.Records.Remove(record);
                         await DbContext.SaveChangesAsync();
                         
@@ -361,6 +376,35 @@ namespace Instructions.Controllers
             return Redirect("~/Identity/Account/Manage/PersonalInstructions");
         }
 
+        
+        [HttpPost]
+        public void DelPhotoFromDB(int ID, bool IsRecord)
+        {
+            if (IsRecord)
+            { DeleteRecordPhoto(ID); }
+            else { DeleteStepPhoto(ID); }
+
+        }
+
+        public void DeleteRecordPhoto(int ID)
+        {
+            Record record = DbContext.Records.Where(a => a.RecordID == ID).FirstOrDefault();
+            if (record != null)
+            {
+                record.ImageLink = null;
+                DbContext.Records.Update(record);
+            }
+            DbContext.SaveChangesAsync();
+        }
+        public void DeleteStepPhoto(int ID)
+        {
+            Image image = DbContext.Images.Where(a => a.ImageID == ID).FirstOrDefault();
+            if (image != null)
+            {
+                DbContext.Images.Remove(image);
+            }
+            DbContext.SaveChangesAsync();
+        }
         public async void DeleteMarks(Record record)
         {
             List<Mark> marks = DbContext.Marks.Where(a => a.RecordID == record).ToList();

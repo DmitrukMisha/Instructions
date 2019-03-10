@@ -29,7 +29,7 @@
         <label class="control-label">Tags</label>
         <input id="tag" type="text" class="form-control" name="Tags" value="@ViewData["TagsList"]" />
     </div>
-   
+
     <h3>Photos</h3>
     <div class="container">
         <div id="RecordPhoto"></div>
@@ -40,6 +40,8 @@
             $.ajax({
         url: '/Records/Photo',
                 type: 'POST',
+                cache: false,
+                async: true,
                 data: { Id: @Model.RecordID, Link: "@Model.ImageLink", IsRecord: true},
                 dataType: "html",
             })
@@ -63,10 +65,10 @@
     @foreach (Step step in ViewBag.Steps)
     {
         <script type="text/javascript">
+
             $.ajax({
-        url: '/Records/NewStep',
+                 url: '/Records/NewStep',
                 type: 'POST',
-                cache: false,
                 async: false,
                 data: { "stepId":@step.StepID},
                 dataType: "html",
