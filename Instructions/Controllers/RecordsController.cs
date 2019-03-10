@@ -6,14 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Instructions.Models;
 using Instructions.Data;
 using Microsoft.AspNetCore.Identity;
-using System.Collections;
 using Microsoft.AspNetCore.Html;
 using Newtonsoft.Json;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Http;
 using System.IO;
 namespace Instructions.Controllers
 {
@@ -162,35 +159,47 @@ namespace Instructions.Controllers
             int index = -1;
             int maxId = filePaths.Max(a => a.id);
             if (!activeSteps.Contains(idnew))
-                do
-                {
-
-                    if (index == -1)
-                    {
-                        idnew++;
-                        index = filePaths.FindIndex(x => x.id == idnew);
-                    }
-                }
-                while (index == -1 && idnew <= maxId && !activeSteps.Contains(idnew));
+                index = SearchIndex(ref idnew, maxId);
             else { index = filePaths.FindIndex(x => x.id == idnew); }
             if (idnew > maxId) return -1;
             if (!(index == -1))
-                while (index < filePaths.Count && filePaths.ElementAt(index).id == idnew)
-                {
-                    string link = await UploadFile(filePaths.ElementAt(index).path, filePaths.ElementAt(index).filename);
-                    if (link != null)
-                    {
-                        Image image = new Image { StepID = step, Link = link };
-                        Recordcontext.Images.Add(image);
-                        await Recordcontext.SaveChangesAsync();
-                    }
-                    index++;
-                }
+                await UploadStepImage(index, idnew, step);
+
             idnew++;
             return idnew;
 
         }
 
+        public int SearchIndex(ref int idnew, int maxId)
+
+        {
+            int index = -1;            
+            do
+            {
+                if (index == -1)
+                {
+                    idnew++;
+                    int id = idnew;
+                    index = filePaths.FindIndex(x => x.id == id);
+                }
+            }
+            while (index == -1 && idnew <= maxId && !activeSteps.Contains(idnew));
+            return index;
+        }
+        public async Task  UploadStepImage(int index, int idnew, Step step)
+        {
+            while (index < filePaths.Count && filePaths.ElementAt(index).id == idnew)
+            {
+                string link = await UploadFile(filePaths.ElementAt(index).path, filePaths.ElementAt(index).filename);
+                if (link != null)
+                {
+                    Image image = new Image { StepID = step, Link = link };
+                    Recordcontext.Images.Add(image);
+                    await Recordcontext.SaveChangesAsync();
+                }
+                index++;
+            }
+        }
         public async Task CreateTags(Record record , string Tags)
         {
     
