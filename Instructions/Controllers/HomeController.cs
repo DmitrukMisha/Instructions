@@ -11,9 +11,6 @@ using Microsoft.Extensions.Localization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-//using Syncfusion.Pdf;
-//using Syncfusion.Pdf.Graphics;
-//using Syncfusion.Drawing;
 using System.IO;
 using IronPdf;
 using HtmlAgilityPack;
@@ -29,6 +26,7 @@ namespace Instructions.Controllers
         static Record record;
         const int CountCloudTags = 10;
         static int count=0,taken=10;
+
 
         public HomeController(IStringLocalizer<HomeController> localizer, UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context)
         {
@@ -62,24 +60,25 @@ namespace Instructions.Controllers
             count -= taken;
             List<Record> records=new List<Record>();
             if (latest)
-            {
-                records = DbContext.Records.ToList().GetRange(count, taken);
-               
-            }
+                records = DbContext.Records.ToList().GetRange(count, taken);               
             else
                 records = DbContext.Records.OrderBy(r => r.Raiting).ToList().GetRange(count,taken);
-            records.Reverse();
-            List<string> raiting = new List<string>();
-            foreach (Record record in records)
-            {
-                raiting.Add(GetRating(record.RecordID.ToString()));
-            }
-            ViewBag.Raiting = raiting;
+            records.Reverse();          
+            ViewBag.Raiting =GetRaiting(records);
             GetTags(records);
             AuthorDataView(records);
             return PartialView(records);
         }
 
+        public List<string> GetRaiting(List<Record> records)
+        {
+            List<string> raiting = new List<string>();
+            foreach (Record record in records)
+            {
+                raiting.Add(GetRating(record.RecordID.ToString()));
+            }
+            return raiting;
+        }
        
         public List<string> GenerateTagsCloudValues()
         {
@@ -173,6 +172,8 @@ namespace Instructions.Controllers
             ViewData["Name"] = record.Name;
             ViewData["Theme"] = record.ThemeName;
             ViewData["Author"] = GetAuthorName(record);
+            ViewData["Description"] = record.Description;
+            ViewData["UserID"] = record.USerID;
         }
 
         public User GetUserById(string id)
@@ -191,9 +192,9 @@ namespace Instructions.Controllers
             return DbContext.Steps.Where(a => a.RecordID == record).ToList();
         }
         
-        public List<Models.Image> GetImages(List<Step> steps)
+        public List<Image> GetImages(List<Step> steps)
         {
-            List<Models.Image> images = new List<Models.Image>();
+            List<Image> images = new List<Models.Image>();
             foreach(Step step in steps)
             {
                 List<Models.Image> imagesFromStep = DbContext.Images.Where(a => a.StepID == step).ToList();
@@ -439,21 +440,9 @@ namespace Instructions.Controllers
 
         public FileResult CreateFile(string path)
         {
-            HtmlWeb htmlWeb = new HtmlWeb
-            {
-                AutoDetectEncoding = false,
-                OverrideEncoding = Encoding.UTF8
-            };
-            string[] elements = new string[3] { "//nav[contains(@class, 'navbar')]", "//div[contains(@id, 'content')]", "//a[contains(@href, '#carousel')]" };
-            var docNode = htmlWeb.Load(path).DocumentNode;
-            foreach (string s in elements)
-            {
-                var removedNav = docNode.SelectNodes(s);
-                foreach (var content in removedNav)
-                    content.Remove();
-            }
+           
             HtmlToPdf renderer = new HtmlToPdf();
-            MemoryStream stream = renderer.RenderHtmlAsPdf(docNode.OuterHtml).Stream;
+            MemoryStream stream = renderer.RenderHtmlAsPdf(GetHtml(path)).Stream;
             stream.Position = 0;
             FileStreamResult fileStreamResult = new FileStreamResult(stream, "application/pdf")
             {
@@ -462,6 +451,25 @@ namespace Instructions.Controllers
             return fileStreamResult;
             
         }
+
+        public string GetHtml(string path)
+        {
+            HtmlWeb htmlWeb = new HtmlWeb
+            {
+                AutoDetectEncoding = false,
+                OverrideEncoding = Encoding.UTF8
+            };
+            string[] elements = new string[4] { "//nav[contains(@class, 'navbar')]", "//div[contains(@id, 'content')]", "//a[contains(@href, '#carousel')]","//script" };
+            var docNode = htmlWeb.Load(path).DocumentNode;
+            foreach (string s in elements)
+            {
+                var removedNav = docNode.SelectNodes(s);
+                foreach (var content in removedNav)
+                    content.Remove();
+            }
+            return docNode.OuterHtml;
+        }
+
         public async Task<IActionResult> Enter(string returnUrl)
         {
             var unlocked = IsLocked(User.Identity.Name);
@@ -587,10 +595,6 @@ namespace Instructions.Controllers
             }
         }
 
-        public List<Record> FilterByThemes(List<Record> records,string Theme)
-        {
-            return records.Where(a => a.ThemeName == Theme).ToList();
-        }
 
         public async Task RemoveUserLikes(User user)
         {

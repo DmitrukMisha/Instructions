@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<Instructions.Models.Step>
 @using Microsoft.AspNetCore.Identity
 @using System.Collections.Generic
-@using Westwind.AspNetCore.Markdown 
+@using Westwind.AspNetCore.Markdown
 
 @{
     ViewData["Title"] = @ViewData["Name"];
@@ -20,36 +20,12 @@
     <span id="value6"></span>
 
 </div>
-<script type="text/javascript">
-    $('#value1').text("(@ViewData["RatingValue"]/5)");
-</script>
-<script type="text/javascript">
-    $("#rateit").bind('rated', function (event, value) {
-        $.ajax({
-            url: '/Home/AddMark',
-            type: 'POST',
-            data: { "value": value, "id":@ViewData["RecordID"]},
-            dataType: "json"
 
-        })
-            .done(function (result) {
-
-
-                $('#value1').text("("+result+"/5)");
-
-            }).fail(function (xhr) {
-                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
-            })
-
-        $('#value6').text('You\'ve rated it: ' + value);
-    });
-</script>
 
 <hr />
 <div class="row">
     <div class="col-md-10">
-
-        <h5>User:@ViewData["Author"]</h5>
+        <h5>User:<a asp-controller="Home" asp-route-id="@ViewData["UserID"]" asp-action="UserPage">@ViewData["Author"]</a> </h5>
     </div>
     <div class="col-md-2">
         <h5>Theme: @ViewData["Theme"]</h5>
@@ -57,6 +33,9 @@
 
 </div>
 <hr />
+<p>@ViewData["Description"]</p>
+<hr />
+
 
 @if (Model.Count() != 0)
 {
@@ -70,8 +49,8 @@
                     <h1>@Model.ElementAt(0).StepName</h1>
                     <hr />
 
-                   
-                        <div>@Markdown.ParseHtmlString(Model.ElementAt(0).Text)</div>
+
+                    <div>@Markdown.ParseHtmlString(Model.ElementAt(0).Text)</div>
 
                     <div class="row justify-content-center">
                         @if (ViewBag.images != null)
@@ -158,53 +137,78 @@
     {
         <h3>You need log in or confirm email to leave comments</h3>
     }
-    </div>
-    <script type="text/javascript">
-        $(function () {
-            $('#carousel').carousel({
-                interval: false
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('#carousel').carousel({
+            interval: false
 
-            });
         });
-    </script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $.ajax({
-                url: '/Home/Comments',
-                type: 'POST',
-                cache: false,
-                async: true,
-                dataType: "html",
+    });
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            url: '/Home/Comments',
+            type: 'POST',
+            cache: false,
+            async: true,
+            dataType: "html",
+        })
+            .done(function (result) {
+                $('#Comments').html(result);
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
             })
-                .done(function (result) {
-                    $('#Comments').html(result);
-                }).fail(function (xhr) {
-                    console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
-                })
-        });
+    });
 
-    </script>
+</script>
 
 
-    <script type="text/javascript">
-        $('#add').on('click', function (e) {
-            $.ajax({
-                url: '/Home/CreateComment',
-                type: 'POST',
-                cache: false,
-                async: true,
-                data: $('#Text').serialize(),
-                dataType: "html"
+<script type="text/javascript">
+    $('#add').on('click', function (e) {
+        $.ajax({
+            url: '/Home/CreateComment',
+            type: 'POST',
+            cache: false,
+            async: true,
+            data: $('#Text').serialize(),
+            dataType: "html"
+        })
+            .done(function (result) {
+                $('#Comments').html(result);
+                $('#Text').val("");
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
             })
-                .done(function (result) {
-                    $('#Comments').html(result);
-                    $('#Text').val("");
-                }).fail(function (xhr) {
-                    console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
-                })
-        });
+    });
 
-    </script>
-    <script type="text/javascript">
-        $(document).ready(function () { $(".image").fancybox(); });
-    </script>
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () { $(".image").fancybox(); });
+</script>
+<script type="text/javascript">
+    $('#value1').text("(@ViewData["RatingValue"]/5)");
+</script>
+<script type="text/javascript">
+    $("#rateit").bind('rated', function (event, value) {
+        $.ajax({
+            url: '/Home/AddMark',
+            type: 'POST',
+            data: { "value": value, "id":@ViewData["RecordID"]},
+            dataType: "json"
+
+        })
+            .done(function (result) {
+
+
+                $('#value1').text("("+result+"/5)");
+
+            }).fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })
+
+        $('#value6').text('You\'ve rated it: ' + value);
+    });
+</script>
