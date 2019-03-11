@@ -70,6 +70,7 @@ namespace Instructions.Controllers
                var tags = Recordcontext.Tags.Select(t => t.TagName).ToList().Distinct();
             ViewBag.Tags = new HtmlString(JsonConvert.SerializeObject(tags, Formatting.None));
             ViewBag.Themes = Recordcontext.Themes.ToList();
+            MainFile = null;
             Record record = Recordcontext.Records.Where(a => a.RecordID == Int32.Parse(RecordIdForUpdate)).FirstOrDefault();
             List<Step> steps = Recordcontext.Steps.Where(a => a.RecordID == record).ToList();
             ViewBag.Steps = steps;
