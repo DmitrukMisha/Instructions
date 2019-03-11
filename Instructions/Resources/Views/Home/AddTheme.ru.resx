@@ -126,6 +126,9 @@
   <data name="No themes here" xml:space="preserve">
     <value>Тем нет</value>
   </data>
+  <data name="String1" xml:space="preserve">
+    <value />
+  </data>
   <data name="Theme" xml:space="preserve">
     <value>Тема</value>
   </data>

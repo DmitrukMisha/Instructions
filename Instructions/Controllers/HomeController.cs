@@ -144,6 +144,7 @@ namespace Instructions.Controllers
             ViewBag.Themes = themes;
             var records = GetRecords(GetUserById(id));
             records.Reverse();
+            GetTags(records);
             return View(records);
         }
 
@@ -432,7 +433,7 @@ namespace Instructions.Controllers
                 record.ImageLink = null;
                 DbContext.Records.Update(record);
             }
-            DbContext.SaveChangesAsync().Wait();
+            DbContext.SaveChanges();
         }
         public void DeleteStepPhoto(int ID)
         {

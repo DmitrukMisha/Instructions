@@ -29,16 +29,26 @@
 </div>
 @foreach (Record item in Model)
 {
-    <div class="jumbotron" myattr="@item.ThemeName">
-        <p class="display-3" align="center"> <a asp-controller="Home" asp-action="Record" asp-route-id="@item.RecordID">@item.Name</a></p>
-        <div class="row">
-            <div class="col-md-3" align="left">
-                <p><font color="gray" size="2" class="myclass">@Localizer["Theme"]: @item.ThemeName</font></p>
-            </div>
+<div class="jumbotron" myattr="@item.ThemeName">
+    <p class="display-3" align="center"> <a asp-controller="Home" asp-action="Record" asp-route-id="@item.RecordID">@item.Name</a></p>
+    <div class="row">
+        <div class="col-md-3" align="left">
+            <p><font color="gray" size="2" class="myclass">@Localizer["Theme"]: @item.ThemeName</font></p>
         </div>
-        <hr />
-        <div color="gray">@item.Description</div>
     </div>
+    <hr />
+    <div color="gray">@item.Description</div>
+    <center>
+        @if (item.ImageLink == null || item.ImageLink == String.Empty)
+        {<img src="~/images/no_photo.png" alt="no image" class="img-fluid center-block" /> }
+        else
+        {
+            <img src="@item.ImageLink" class="img-fluid center-block" style="height:700px;width:auto" />}
+        <hr />
+    </center>
+
+    <p><font color="gray" size="2">@ViewData[item.RecordID.ToString()] </font></p>
+</div>
 }
 
 <script type="text/javascript">
