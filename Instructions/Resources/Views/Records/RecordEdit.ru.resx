@@ -117,19 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Dark theme" xml:space="preserve">
-    <value>Темная тема</value>
+  <data name="Add new step" xml:space="preserve">
+    <value>Добавить шаг</value>
   </data>
-  <data name="Home" xml:space="preserve">
-    <value>Главная</value>
+  <data name="Description" xml:space="preserve">
+    <value>Описание</value>
   </data>
-  <data name="Light theme" xml:space="preserve">
-    <value>Светлая тема</value>
+  <data name="Name" xml:space="preserve">
+    <value>Название</value>
   </data>
-  <data name="My page" xml:space="preserve">
-    <value>Моя страница</value>
+  <data name="Only one file here" xml:space="preserve">
+    <value>Только один файл</value>
   </data>
-  <data name="Search" xml:space="preserve">
-    <value>Поиск</value>
+  <data name="Record Edit" xml:space="preserve">
+    <value>Изменение записи</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Теги</value>
+  </data>
+  <data name="Theme name" xml:space="preserve">
+    <value>Тема</value>
   </data>
 </root>

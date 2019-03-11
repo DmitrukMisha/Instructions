@@ -117,10 +117,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Header" xml:space="preserve">
-    <value>Добро пожаловать</value>
+  <data name="Filter" xml:space="preserve">
+    <value>Фильтр</value>
   </data>
-  <data name="Message" xml:space="preserve">
-    <value>Привет!!</value>
+  <data name="First new" xml:space="preserve">
+    <value>Сначала новые</value>
+  </data>
+  <data name="Get more records" xml:space="preserve">
+    <value>Получить больше записей</value>
+  </data>
+  <data name="Rated" xml:space="preserve">
+    <value>По рейтингу</value>
+  </data>
+  <data name="Themes" xml:space="preserve">
+    <value>Темы</value>
   </data>
 </root>

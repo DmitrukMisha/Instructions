@@ -117,10 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Header" xml:space="preserve">
-    <value>Welcome</value>
+  <data name="'s page" xml:space="preserve">
+    <value> страница</value>
   </data>
-  <data name="Message" xml:space="preserve">
-    <value>Hello!!</value>
+  <data name="Confirm email to create records" xml:space="preserve">
+    <value>Подтвердите адрес электронной почты для создания записей</value>
+  </data>
+  <data name="Create new record" xml:space="preserve">
+    <value>Создать новую запись</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Тема</value>
   </data>
 </root>

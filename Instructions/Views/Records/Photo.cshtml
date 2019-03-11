@@ -1,21 +1,22 @@
 ﻿
 @{
-    ViewData["Title"] = "Photo";
+    ViewData["Title"] = Localizer["Photo"];
 }
-
-<div style="height:150px; display:inline-block" class="myclass1">
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+<div style="height:150px; display:inline-block" class="myclass-@ViewData["PhotoID"]">
     <img src="@ViewData["Link"]" height="100" style="width:auto"><br />
-    <button type="button" class="btn btn-danger btn-sm del-photo" style="float:left;display:block;position: relative;margin:0 auto;">Delete photo</button>
+    <button type="button" class="btn btn-danger btn-sm del-photo-@ViewData["PhotoID"]" style="float:left;display:block;position: relative;margin:0 auto;">@Localizer["Delete photo"]</button>
 </div>
 <script type="text/javascript">
-    $(".del-photo").click(function () {
+    $(".del-photo-@ViewData["PhotoID"]").click(function () {
         $.ajax({
             url: '/Home/DelPhotoFromDB',
             type: 'POST',
             data: { ID: @ViewData["PhotoID"], IsRecord:"@ViewData["IsRecord"]"},
             })
 
-        $(this).closest(".myclass1").remove();
+        $(this).closest(".myclass-@ViewData["PhotoID"]").remove();
         return false;
     });
 </script>

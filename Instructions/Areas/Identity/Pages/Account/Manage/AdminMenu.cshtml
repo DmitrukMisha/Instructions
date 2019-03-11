@@ -1,8 +1,10 @@
 ﻿@page
 @model AdminMenuModel
 @inject UserManager<User> UserManager
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "AdminMenu";
+        ViewData["Title"] = Localizer["Admin menu"];
     var users = UserManager.Users.ToList();
 
 }
@@ -11,69 +13,69 @@
 @if (ViewData["EmailConfirm"].ToString() == "False")
 {
     <script language="JavaScript">
-        alert("Confirm your E-mail");
+        alert(@Localizer["Confirm your E-mail"]);
         location.href = "Index";
     </script>
 }
-    <input type="button" value="Themes" class="btn btn-outline-success" onclick="window.location='@Url.Action("AddTheme", "Home")'" />
+<input type="button" value="@Localizer["Themes"]" class="btn btn-outline-success" onclick="window.location='@Url.Action("AddTheme", "Home")'" />
 <hr />
 <form method="post">
     <table class="table">
         <tr>
-            <th>Users:</th>
+            <th>@Localizer["Users"]:</th>
             <th>
-                <button type="submit" asp-controller="Home" asp-action="MakeAdmin" class="btn btn-sm btn-success"> Make admin</button>
+                <button type="submit" asp-controller="Home" asp-action="MakeAdmin" class="btn btn-sm btn-success">@Localizer["Make|Unmake admin"]</button>
             </th>
 
             <th>
-                <button type="submit" asp-controller="Home" asp-action="Lock" class="btn btn-sm btn-warning"> Lock</button>
+                <button type="submit" asp-controller="Home" asp-action="Lock" class="btn btn-sm btn-warning">@Localizer["Lock"]</button>
             </th>
             <th>
-                <button type="submit" asp-controller="Home" asp-action="Unlock" class="btn btn-sm btn-success"> Unlock</button>
+                <button type="submit" asp-controller="Home" asp-action="Unlock" class="btn btn-sm btn-success">@Localizer["Unlock"]</button>
             </th>
             <th>
-                <button type="submit" asp-controller="Home" asp-action="Delete" class="btn btn-sm btn-danger"> Delete</button>
+                <button type="submit" asp-controller="Home" asp-action="Delete" class="btn btn-sm btn-danger">@Localizer["Delete"]</button>
             </th>
             <th></th>
         </tr>
         <tr>
             <th>
-                <input type="checkbox" onClick="toggle(this)" /> Toggle All<br />
+                <input type="checkbox" onClick="toggle(this)" />@Localizer["Toggle All"]<br />
             </th>
             <th>
-                Username
+                @Localizer["Username"]
             </th>
             <th>
                 Email
             </th>
             <th>
-                User status
+                @Localizer["Status"]
             </th>
             <th>
-                Admin status
+               
             </th>
         </tr>
         @foreach (var user in users)
         {
-        <tr>
-            <th>
-                <input type="checkbox" name="selected" value="@user.Id" />
-            </th>
-            <td><a asp-controller="Home" asp-route-id="@user.Id" asp-action="UserPage">@user.UserName<span class="sr-only"></span></a></td>
-            <td>@user.Email</td>
-            <td>
-                @if (user.Status)
-                {<p style="color:green;">Unlocked</p>}
-                else
-                { <p style="color:orangered;">Locked</p>}
-            </td>
-            <td>
-                @if (user.RoleISAdmin)
-                {<p style="color:green;">Admin</p>}
-                else
-                { <p style="color:cornflowerblue;">User</p>}
-            </td>
-        </tr>
+            <tr>
+                <th>
+                    <input type="checkbox" name="selected" value="@user.Id" />
+                </th>
+                <td><a asp-controller="Home" asp-route-id="@user.Id" asp-action="UserPage">@user.UserName<span class="sr-only"></span></a></td>
+                <td>@user.Email</td>
+                <td>
+                    @if (user.Status)
+                    {<p style="color:green;">@Localizer["Unlocked"]</p>}
+                    else
+                    { <p style="color:orangered;">@Localizer["Locked"]</p>}
+                </td>
+                <td>
+                    @if (user.RoleISAdmin)
+                    {<p style="color:green;">@Localizer["Admin"]</p>}
+                    else
+                    { <p style="color:cornflowerblue;">@Localizer["User"]</p>}
+                </td>
+            </tr>
 
         }
     </table>
