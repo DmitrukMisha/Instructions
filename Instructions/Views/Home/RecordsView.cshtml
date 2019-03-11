@@ -12,12 +12,10 @@
             </div>
             <div class="col-md-5">
                 <div class="rateit" id="rateit" data-rateit-value="@ViewBag.Raiting[Model.IndexOf(item)]" data-rateit-ispreset="true" data-rateit-readonly="true" data-rateit-mode="font" style="font-size:30px">  </div>
-            
             </div>
-
             <div class="col-md-2" align="right">
                 <p>
-                    <font color="gray" size="2">@item.ThemeName</font>
+                    <font color="gray" size="2"><a asp-controller="Search" asp-route-TextSearchInput="@item.ThemeName" asp-action="Index">@item.ThemeName</a></font>
                 </p>
             </div>
         </div>
@@ -32,23 +30,7 @@
                 <img src="@item.ImageLink" class="img-fluid center-block" height="200" style="width:auto"/>}
             <hr />
         </center>
-        <div class="col-md-2" align="right">
-            <p>
-                <font color="gray" size="2"><a asp-controller="Search" asp-route-TextSearchInput="@item.ThemeName" asp-action="Index">@item.ThemeName</a></font>
-            </p>
-        </div>
+      
     </div>
-    <hr />
-    <div color="gray">@Westwind.AspNetCore.Markdown.Markdown.ParseHtmlString(item.Description)</div>
-    <hr />
-    <center>
-        @if (item.ImageLink == null || item.ImageLink == String.Empty)
-        {<img src="~/images/no_photo.png" alt="no image" class="img-fluid center-block" /> }
-        else
-        {
-            <img src="@item.ImageLink" class="img-fluid center-block" />}
-        <hr />
-    </center>
-
     <p><font color="gray" size="2">@Html.Encode(@ViewData[item.RecordID.ToString()]) </font></p>
 }

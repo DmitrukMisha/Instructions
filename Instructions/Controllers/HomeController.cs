@@ -337,7 +337,7 @@ namespace Instructions.Controllers
 
             return Json(GetRating(id.ToString())) ;
         }
-        public async void DeleteLikes(Comment comment)
+        public async Task DeleteLikes(Comment comment)
         {
             List<Like> likes = DbContext.Likes.Where(a => a.CommentID == comment).ToList();
             foreach(Like like in likes)
@@ -347,19 +347,19 @@ namespace Instructions.Controllers
             await DbContext.SaveChangesAsync();
         }
 
-         public async void DeleteComments(Record record)
+         public async Task DeleteComments(Record record)
         {
             List<Comment> comments = DbContext.Comments.Where(a => a.RecordID == record.RecordID).ToList();
             foreach(Comment comment in comments)
             {
-                DeleteLikes(comment);
+                await DeleteLikes(comment);
                 DbContext.Comments.Remove(comment);
             }
             
             await DbContext.SaveChangesAsync();
         }
 
-        public async void DeleteTags(Record record)
+        public async Task DeleteTags(Record record)
         {
             List<Tag> tags = DbContext.Tags.Where(a => a.Record == record).ToList();
             foreach (Tag tag in tags)
@@ -401,9 +401,9 @@ namespace Instructions.Controllers
                             }
                             DbContext.Steps.Remove(step);
                         }
-                        DeleteComments(record);
-                        DeleteTags(record);
-                        DeleteMarks(record);
+                        await DeleteComments(record);
+                        await DeleteTags(record);
+                        await DeleteMarks(record);
                        
                         DbContext.Records.Remove(record);
                         await DbContext.SaveChangesAsync();
@@ -416,7 +416,7 @@ namespace Instructions.Controllers
 
         
         [HttpPost]
-        public void DelPhotoFromDB(int ID, bool IsRecord)
+        public void  DelPhotoFromDB(int ID, bool IsRecord)
         {
             if (IsRecord)
             { DeleteRecordPhoto(ID); }
@@ -432,7 +432,7 @@ namespace Instructions.Controllers
                 record.ImageLink = null;
                 DbContext.Records.Update(record);
             }
-            DbContext.SaveChangesAsync();
+            DbContext.SaveChangesAsync().Wait();
         }
         public void DeleteStepPhoto(int ID)
         {
@@ -441,9 +441,9 @@ namespace Instructions.Controllers
             {
                 DbContext.Images.Remove(image);
             }
-            DbContext.SaveChangesAsync();
+            DbContext.SaveChangesAsync().Wait();
         }
-        public async void DeleteMarks(Record record)
+        public async Task DeleteMarks(Record record)
         {
             List<Mark> marks = DbContext.Marks.Where(a => a.RecordID == record).ToList();
             foreach(Mark mark in marks)
@@ -473,7 +473,7 @@ namespace Instructions.Controllers
         public async Task<IActionResult> DeleteComment(int id)
         {
             Comment comment = DbContext.Comments.Where(a => a.CommentID == id).FirstOrDefault();
-            DeleteLikes(comment);
+            await DeleteLikes(comment);
             DbContext.Comments.Remove(comment);
              await DbContext.SaveChangesAsync();
             return RedirectToAction("Comments");
