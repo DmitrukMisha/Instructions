@@ -1,23 +1,24 @@
 ﻿@using Instructions.Models
 
 @model Instructions.Models.Record
-
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
     ViewData["Title"] = "RecordEdit";
 }
 <script src="~/lib/dropzone/dropzone.js"></script>
-<h2>RecordEdit</h2>
+<h2>@Localizer["Record Edit"]</h2>
 <form asp-action="Update" asp-controller="records">
     <div class="form-group">
-        <label asp-for="Name" class="control-label">Name</label>
+        <label asp-for="Name" class="control-label">@Localizer["Name"]</label>
         <input required type="text" asp-for="Name" class="form-control" />
     </div>
     <div class="form-group">
-        <label asp-for="Description" class="control-label">Description</label>
+        <label asp-for="Description" class="control-label">@Localizer["Description"]</label>
         <input required type="text" asp-for="Description" class="form-control" />
     </div>
     <div class="form-group">
-        <label asp-for="ThemeName" class="control-label">Theme name</label>
+        <label asp-for="ThemeName" class="control-label">@Localizer["Theme name"]</label>
         <select asp-for="ThemeName" class="form-control">
             @foreach (Theme theme in ViewBag.Themes)
             {
@@ -26,11 +27,9 @@
         </select>
     </div>
     <div class="form-group">
-        <label class="control-label">Tags</label>
+        <label class="control-label">@Localizer["Tags"]</label>
         <input id="tag" type="text" class="form-control" name="Tags" value="@ViewData["TagsList"]" />
     </div>
-
-    <h3>Photos</h3>
     <div class="container">
         <div id="RecordPhoto"></div>
     </div>
@@ -72,8 +71,7 @@
                 async: false,
                 data: { "stepId":@step.StepID},
                 dataType: "html",
-            })
-                .done(function (result) {
+            }) .done(function (result) {
                     $('#Steps').append(result);
         }).fail(function (xhr) {
             console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
@@ -81,13 +79,13 @@
         </script>
     }
     <center>
-        <input id="add" type="button" class="btn btn-default" value="Add new step" />
+        <input id="add" type="button" class="btn btn-default" value="@Localizer["Add new step"]" />
     </center>
     <br />
 
     <center>
         <div class="form-group">
-            <input type="submit" value="Save" class="btn btn-default" />
+            <input type="submit" value="@Localizer["Save"]" class="btn btn-default" />
         </div>
     </center>
 </form>
@@ -148,7 +146,7 @@
         url: "/Records/UploadFiles",
         maxFiles: 1,
         maxfilesexceeded: function (file) {
-            alert("Only one file here");
+            alert("@Localizer["Only one file here"]");
             this.removeFile(file);
         }
     });

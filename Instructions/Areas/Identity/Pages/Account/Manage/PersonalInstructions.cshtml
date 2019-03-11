@@ -2,42 +2,43 @@
 @model PersonalInstructionsModel
 
 @{
-    ViewData["Title"] = "Instructions";
+    ViewData["Title"] = Localizer["Instructions"];
     ViewData["ActivePage"] = ManageNavPages.PersonalInstructions;
 
 }
-
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 <h4>@ViewData["Title"]</h4>
 @if (ViewData["EmailConfirm"].ToString() == "False")
 {
     <script language="JavaScript">
-        alert("Confirm your E-mail");
+        alert(@Localizer["Confirm your E-mail"]);
         location.href = "Index";
     </script>
 }
 <form method="post">
     <table class="table">
         <tr>
-            <th><input type="button" value="Add new instruction" onclick="window.location='@Url.Action("Index", "Records")'" class="btn btn-sm btn-success" /></th>
+            <th><input type="button" value="@Localizer["Add new instruction"]" onclick="window.location='@Url.Action("Index", "Records")'" class="btn btn-sm btn-success" /></th>
             <th>
-                <button type="submit" asp-controller="Home" asp-action="DeleteRecords" class="btn btn-sm btn-danger"> Delete</button>
+                <button type="submit" asp-controller="Home" asp-action="DeleteRecords" class="btn btn-sm btn-danger">@Localizer["Delete"]</button>
             </th>
             <th></th>
             <th></th>
         </tr>
         <tr>
             <th>
-                <input type="checkbox" onClick="toggle(this)" /> Toggle All<br />
+                <input type="checkbox" onClick="toggle(this)" />@Localizer["Toggle All"]<br />
             </th>
             <th>
-                Record name
+                @Localizer["Record name"]
             </th>
             <th>
-                Theme name
+                @Localizer["Theme name"] 
             </th>
             <th>
-                Theme description
+                @Localizer["Description"]
             </th>
         </tr>
         @foreach (Record item in Model.Records)
@@ -46,7 +47,7 @@
                 <th>
                     <input type="checkbox" name="selected" value="@item.RecordID" />
                 </th>
-                <td>@item.Name</td>
+                <td><a asp-controller="Home" asp-action="Record" asp-route-id="@item.RecordID">@item.Name</a></td>
                 <td>@item.ThemeName</td>
                 <td>@item.Description</td>
             </tr>

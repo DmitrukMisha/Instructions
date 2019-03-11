@@ -1,55 +1,56 @@
 ﻿@model IEnumerable<Instructions.Models.Theme>
-
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 <h2>AddTheme</h2>
 
 
-    <form method="post" >
-        <table class="table">
+<form method="post">
+    <table class="table">
+        <tr>
+            <th>
+                <input type="text" name="theme_name" />
+                <button type="submit" asp-controller="Records" asp-action="CreateTheme" class="btn btn-sm btn-success">@Localizer["Add theme"]</button>
+            </th>
+            @if (Model != null)
+            {
+                <th>
+                    <button type="submit" asp-controller="Records" asp-action="DeleteTheme" class="btn btn-sm btn-danger">@Localizer["Delete"]</button>
+                </th>
+            }
+        </tr>
+        @if (Model != null)
+        {
             <tr>
                 <th>
-                    <input  type="text" name="theme_name"  />
-                    <button type="submit" asp-controller="Records"  asp-action="CreateTheme" class="btn btn-sm btn-success"> Add theme</button>
+                    <input type="checkbox" onClick="toggle(this)" />@Localizer["Toggle All"]<br />
                 </th>
-                @if (Model != null)
-                {
-                    <th>
-                        <button type="submit" asp-controller="Records"  asp-action="DeleteTheme" class="btn btn-sm btn-danger"> Delete</button>
-                    </th>
-                }
+                <th>
+                    @Localizer["Theme"]
+                </th>
             </tr>
-            @if (Model != null)
+            @foreach (Theme item in Model)
             {
                 <tr>
                     <th>
-                        <input type="checkbox" onClick="toggle(this)" /> Toggle All<br />
+                        <input type="checkbox" name="selected" value="@item.ThemeID" />
                     </th>
-                    <th>
-                        Theme
-                    </th>
+                    <td>@item.Themes</td>
+
                 </tr>
-                @foreach (Theme item in Model)
-                {
-                    <tr>
-                        <th>
-                            <input type="checkbox" name="selected" value="@item.ThemeID" />
-                        </th>
-                        <td>@item.Themes</td>
-
-                    </tr>
-                }
-            }
-        </table>
-    </form>
-    @if (Model == null)
-    {
-
-        <p>No themes here</p>
-    }
-    <script language="JavaScript">
-        function toggle(source) {
-            checkboxes = document.getElementsByName('selected');
-            for (var i = 0, n = checkboxes.length; i < n; i++) {
-                checkboxes[i].checked = source.checked;
             }
         }
-    </script>
+    </table>
+</form>
+@if (Model == null)
+{
+
+<p> @Localizer["No themes here"]</p>
+}
+<script language="JavaScript">
+    function toggle(source) {
+        checkboxes = document.getElementsByName('selected');
+        for (var i = 0, n = checkboxes.length; i < n; i++) {
+            checkboxes[i].checked = source.checked;
+        }
+    }
+</script>

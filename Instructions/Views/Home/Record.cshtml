@@ -2,6 +2,8 @@
 @using Microsoft.AspNetCore.Identity
 @using System.Collections.Generic
 @using Westwind.AspNetCore.Markdown
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 @{
     ViewData["Title"] = @ViewData["Name"];
@@ -10,7 +12,7 @@
 <h1>
     @ViewData["Name"]
     @if (User.Identity.Name != null && (User.Identity.Name == ViewData["Author"].ToString() || (bool)ViewData["Role"]))
-    {<a asp-controller="Records" style="font-size:20px" asp-action="RecordEdit" asp-route-RecordId="@ViewData["RecordID"]">Edit</a>}
+    {<a asp-controller="Records" style="font-size:20px" asp-action="RecordEdit" asp-route-RecordId="@ViewData["RecordID"]">@Localizer["Edit"]</a>}
 
 </h1>
 
@@ -27,22 +29,22 @@
     if ((bool)ViewData["EmailConfirmed"])
     {
         <form method="post">
-        <button type="submit" asp-controller="Home" asp-action="DeleteRecord" asp-route-selected="@ViewData["RecordID"]" class="btn btn-sm btn-danger"> Delete record</button>
+            <button type="submit" asp-controller="Home" asp-action="DeleteRecord" asp-route-selected="@ViewData["RecordID"]" class="btn btn-sm btn-danger">@Localizer["Delete record"]</button>
         </form>
     }
     else
     {
-        <p class="col-md-4">Confirm email to delete records</p>
+        <p class="col-md-4">@Localizer["Confirm email to delete records"]</p>
     }
 }
 
 <hr />
 <div class="row">
     <div class="col-md-10">
-        <h5>User:<a asp-controller="Home" asp-route-id="@ViewData["UserID"]" asp-action="UserPage">@ViewData["Author"]</a> </h5>
+        <h5>@Localizer["User"]:<a asp-controller="Home" asp-route-id="@ViewData["UserID"]" asp-action="UserPage">@ViewData["Author"]</a> </h5>
     </div>
     <div class="col-md-2">
-        <h5>Theme: @ViewData["Theme"]</h5>
+        <h5>@Localizer["Theme"]: @ViewData["Theme"]</h5>
     </div>
 
 </div>
@@ -53,17 +55,12 @@
 
 @if (Model.Count() != 0)
 {
-
     <div id="carousel" class="carousel slide" data-ride="carousel">
-        <!-- Индикаторы -->
         <div class="carousel-inner">
-
             <div class="carousel-item active">
                 <div class="jumbotron">
                     <h1>@Model.ElementAt(0).StepName</h1>
                     <hr />
-
-
                     <div>@Markdown.ParseHtmlString(Model.ElementAt(0).Text)</div>
 
                     <div class="row justify-content-center">
@@ -81,7 +78,6 @@
                                         </a>
                                     </center>
                                 }
-
                             }
                         }
                     </div>
@@ -90,13 +86,10 @@
             @for (Int32 i = 1; i < Model.Count(); i++)
             {
                 <div class="carousel-item">
-
                     <div class="jumbotron">
                         <h1> @Model.ElementAt(i).StepName</h1>
                         <hr />
                         <p>@Model.ElementAt(i).Text</p>
-
-
                         <div class="row justify-content-center">
                             @if (ViewBag.images != null)
                             {
@@ -120,21 +113,20 @@
                 </div>
             }
 
-            <!-- Элементы управления -->
             <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Предыдущий</span>
-            </a>
+                <span class="sr-only">@Localizer["Previous"]</span>
+</a>
             <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Следующий</span>
+                <span class="sr-only">@Localizer["Next"]</span>
             </a>
         </div>
     </div>
 }
 <hr />
 <div id="content">
-    <p><a asp-controller="Home" asp-action="CreateFile" asp-route-path="@string.Format("{0}://{1}{2}{3}", Context.Request.Scheme, Context.Request.Host, Context.Request.Path, Context.Request.QueryString)">DownloadPDF</a></p>
+    <p><a asp-controller="Home" asp-action="CreateFile" asp-route-path="@string.Format("{0}://{1}{2}{3}", Context.Request.Scheme, Context.Request.Host, Context.Request.Path, Context.Request.QueryString)">@Localizer["Download PDF"]</a></p>
     <hr />
     <div id="Comments"></div>
     <hr />
@@ -142,14 +134,14 @@
     {
 
         <div class="form-group">
-            <label class="control-label">Comment</label>
+            <label class="control-label">@Localizer["Comment"]</label>
             <input type="text" name="Text" id="Text" class="form-control" />
         </div>
-        <input type="submit" id="add" value="Send" class="btn btn-default" />
+        <input type="submit" id="add" value="@Localizer["Send"]" class="btn btn-default" />
     }
     else
     {
-        <h3>You need log in or confirm email to leave comments</h3>
+        <h3>@Localizer["You need log in or confirm email to leave comments"]</h3>
     }
 </div>
 <script type="text/javascript">
@@ -224,7 +216,7 @@
                 console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
             })
 
-        $('#value6').text('You\'ve rated it: ' + value);
+        $('#value6').text('@Localizer["You have rated it:"] ' + value);
     });
 </script>
 
