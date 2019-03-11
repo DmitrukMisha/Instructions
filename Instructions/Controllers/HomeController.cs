@@ -50,6 +50,15 @@ namespace Instructions.Controllers
         [HttpPost]
         public IActionResult RecordsView(string theme="-", bool latest=true, bool update=false,string userId=null)
         {
+            List<Record> records = GetRecordsForView(theme, latest, update, userId);
+            ViewBag.Raiting =GetRaiting(records);
+            GetTags(records);
+            AuthorDataView(records);
+            return PartialView(records);
+        }
+
+        public List<Record> GetRecordsForView(string theme, bool latest, bool update, string userId)
+        {
             List<Record> records = new List<Record>();
             if (userId == null)
             {
@@ -59,7 +68,7 @@ namespace Instructions.Controllers
             if (theme == "-")
                 records = records.ToList();
             else
-                records =records.Where(a => a.ThemeName == theme).ToList();
+                records = records.Where(a => a.ThemeName == theme).ToList();
             if (update)
             {
                 count = records.Count();
@@ -68,16 +77,13 @@ namespace Instructions.Controllers
             if (count < 10)
                 taken = count;
             count -= taken;
-            
+
             if (latest)
-                records =records.GetRange(count, taken);               
+                records = records.GetRange(count, taken);
             else
-                records = records.OrderBy(r => r.Raiting).ToList().GetRange(count,taken);
-            records.Reverse();          
-            ViewBag.Raiting =GetRaiting(records);
-            GetTags(records);
-            AuthorDataView(records);
-            return PartialView(records);
+                records = records.OrderBy(r => r.Raiting).ToList().GetRange(count, taken);
+            records.Reverse();
+            return records;
         }
 
         public List<string> GetRaiting(List<Record> records)
@@ -135,10 +141,7 @@ namespace Instructions.Controllers
         public IActionResult UserPage(string id)
         {
             ViewData["Name"] = GetUserById(id).UserName;
-            List<string> themes = new List<string>
-            {
-                "-"
-            };
+            List<string> themes = new List<string>();
             if (user != null)
             {
                 ViewData["Role"] = user.RoleISAdmin;
@@ -461,17 +464,22 @@ namespace Instructions.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateComment(string Text)
         {
-            Comment comment = new Comment
+            if (Text != null && Text.Replace(" ", string.Empty) != "")
             {
-                Text = Text,
-                RecordID = record.RecordID,
+                
+                    Comment comment = new Comment
+                    {
+                        Text = Text,
+                        RecordID = record.RecordID,
 
-            };
-            User user = await _userManager.GetUserAsync(User);
-            comment.UserID = user.Id;
-            comment.UserName = user.UserName;
-            DbContext.Comments.Add(comment);
-            await DbContext.SaveChangesAsync();
+                    };
+                    User user = await _userManager.GetUserAsync(User);
+                    comment.UserID = user.Id;
+                    comment.UserName = user.UserName;
+                    DbContext.Comments.Add(comment);
+                    await DbContext.SaveChangesAsync();
+                
+            }
             return RedirectToAction("Comments");
 
         }
@@ -486,10 +494,13 @@ namespace Instructions.Controllers
         }
         public async Task<IActionResult> EditComment(int id, string Text)
         {
-            Comment comment = DbContext.Comments.Where(a => a.CommentID == id).FirstOrDefault();
-            comment.Text = Text;    
-            DbContext.Update(comment);
-            await DbContext.SaveChangesAsync();
+            if (Text != null && Text.Replace(" ", string.Empty) != "")
+            { 
+                Comment comment = DbContext.Comments.Where(a => a.CommentID == id).FirstOrDefault();
+                    comment.Text = Text;
+                    DbContext.Update(comment);
+                    await DbContext.SaveChangesAsync();  
+            }
             return RedirectToAction("Comments");
         }
 

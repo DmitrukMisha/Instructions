@@ -246,13 +246,7 @@ namespace Instructions.Controllers
             if (user != null)
             {
                 Record recordfromdb = Recordcontext.Records.Where(a => a.RecordID == Int32.Parse(RecordIdForUpdate)).FirstOrDefault();
-                recordfromdb.Description = record.Description;
-                recordfromdb.Name = record.Name;
-                recordfromdb.ThemeName = record.ThemeName;
-                if(recordfromdb.ImageLink == null&&MainFile!=null)
-                recordfromdb.ImageLink = await CreateImageForRecord(record);
-                Recordcontext.Records.Update(recordfromdb);
-                await Recordcontext.SaveChangesAsync();
+                await UpdateRecord(recordfromdb,record);
                 await UpdateSteps(StepName, Text, recordfromdb);
                 await UpdateTags(recordfromdb, Tags);
                 return Redirect("/home");
@@ -261,26 +255,27 @@ namespace Instructions.Controllers
 
         }
 
-        
+        public async Task UpdateRecord(Record recordfromdb, Record record)
+        {
+            
+            recordfromdb.Description = record.Description;
+            recordfromdb.Name = record.Name;
+            recordfromdb.ThemeName = record.ThemeName;
+            if (MainFile != null)
+                recordfromdb.ImageLink = await CreateImageForRecord(record);
+            Recordcontext.Records.Update(recordfromdb);
+            await Recordcontext.SaveChangesAsync();
+        }
 
         [HttpPost]
-        public  async Task DelStepFromDB(int StepID)
+        public void DelStepFromDB(int StepID)
         {
-           await DeleteStepPhotos(StepID);
             StepsIdForDelete.Add(StepID);
-        }
-        public async Task DeleteStepPhotos(int stepId)
-        {
-             var images= Recordcontext.Images.Where(a => a.StepID.StepID == stepId).ToList();
-            foreach (var image in images)
-                Recordcontext.Images.Remove(image);
-            await Recordcontext.SaveChangesAsync();
-
         }
 
         public async Task DeletePhotosFromStep(Step step)
         {
-            List<Image> images = Recordcontext.Images.Where(a => a.StepID == step).ToList();
+            List<Image> images = Recordcontext.Images.Where(a => a.StepID.StepID == step.StepID).ToList();
             foreach(Image image in images)
             {
                 Recordcontext.Images.Remove(image);
@@ -294,24 +289,38 @@ namespace Instructions.Controllers
             if (filePaths != null)
                 filePathsSorted = (from filepath in filePaths orderby filepath.id select filepath).ToList();
             int index = 1;
-            for (int i=0; i<StepsIdForUpdate.Count;i++)
+            index= await UpdateExistSteps(StepName,Text,filePathsSorted,index);
+            await UpdateNewSteps(StepName, Text, filePathsSorted, index, record);
+            await Recordcontext.SaveChangesAsync();  
+        }
+
+        public async Task<int> UpdateExistSteps(List<string> StepName, List<string> Text, List<FilePath> filePathsSorted,int index)
+        {
+            int j = 0;
+            for (int i = 0; i < StepsIdForUpdate.Count; i++)
             {
-               
+
                 Step step = Recordcontext.Steps.Where(a => a.StepID == StepsIdForUpdate.ElementAt(i)).FirstOrDefault();
                 if (StepsIdForDelete.Contains(StepsIdForUpdate.ElementAt(i)))
                 {
-                   await DeletePhotosFromStep(step);
+                    await DeletePhotosFromStep(step);
                     Recordcontext.Steps.Remove(step);
                 }
                 else
                 {
-                    step.StepName = StepName.ElementAt(i);
-                    step.Text = Text.ElementAt(i);
+                    step.StepName = StepName.ElementAt(j);
+                    step.Text = Text.ElementAt(j);
                     Recordcontext.Steps.Update(step);
                     if (index != -1 && filePathsSorted.Count != 0)
                         index = await CreateImagesForStep(filePathsSorted, step, index);
+                    j++;
                 }
             }
+            return index;
+        }
+
+        public async Task UpdateNewSteps(List<string> StepName, List<string> Text, List<FilePath> filePathsSorted, int index,Record record)
+        {
             int CountDefaultSteps = StepsIdForUpdate.Count - StepsIdForDelete.Count;
             for (int i = CountDefaultSteps; i < StepName.Count; i++)
             {
@@ -322,13 +331,12 @@ namespace Instructions.Controllers
                     RecordID = record
                 };
                 Recordcontext.Steps.Add(step);
+                await Recordcontext.SaveChangesAsync();
                 if (index != -1 && filePathsSorted.Count != 0)
                     index = await CreateImagesForStep(filePathsSorted, step, index);
             }
-            
-            await Recordcontext.SaveChangesAsync();
-            
         }
+
         public async Task UpdateTags(Record record, string Tags)
         {
             if (Tags != null)
@@ -461,10 +469,13 @@ namespace Instructions.Controllers
                 return null;
             }
         }
-
-       
-
         [HttpPost]
+        public void RemoveFileFromRecord()
+        {
+            MainFile = null;
+        }
+
+         [HttpPost]
         public async Task<ActionResult> DeleteTheme(string[] selected)
         {
 

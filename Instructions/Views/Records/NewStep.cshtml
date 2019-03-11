@@ -62,10 +62,10 @@
 
         </div>
     </div>
-    <button type="button" class="btn btn-danger del-step" commid="@ViewData["id"]">@Localizer["Delete step"]</button>
+    <button type="button" class="btn btn-danger del-step-@ViewData["StepID"]" commid="@ViewData["id"]">@Localizer["Delete step"]</button>
 </div>
 <script type="text/javascript">
-    $(".del-step").click(function () {
+    $(".del-step-@ViewData["StepID"]").click(function () {
         var x = @ViewData["Update"];
         if (x) {
             $.ajax({
