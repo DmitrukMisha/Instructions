@@ -278,6 +278,16 @@ namespace Instructions.Controllers
 
         }
 
+        public async Task DeletePhotosFromStep(Step step)
+        {
+            List<Image> images = Recordcontext.Images.Where(a => a.StepID == step).ToList();
+            foreach(Image image in images)
+            {
+                Recordcontext.Images.Remove(image);
+            }
+           await Recordcontext.SaveChangesAsync();
+        }
+
         public async Task UpdateSteps(List<string> StepName, List<string> Text, Record record)
         {
             List<FilePath> filePathsSorted = new List<FilePath>();
@@ -290,6 +300,7 @@ namespace Instructions.Controllers
                 Step step = Recordcontext.Steps.Where(a => a.StepID == StepsIdForUpdate.ElementAt(i)).FirstOrDefault();
                 if (StepsIdForDelete.Contains(StepsIdForUpdate.ElementAt(i)))
                 {
+                   await DeletePhotosFromStep(step);
                     Recordcontext.Steps.Remove(step);
                 }
                 else

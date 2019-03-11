@@ -149,6 +149,7 @@ namespace Instructions.Controllers
             ViewBag.Themes = themes;
             var records = GetRecords(GetUserById(id));
             records.Reverse();
+            GetTags(records);
             return View(records);
         }
 
