@@ -48,13 +48,18 @@ namespace Instructions.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult RecordsView(string theme="-", bool latest=true, bool update=false)
+        public IActionResult RecordsView(string theme="-", bool latest=true, bool update=false,string userId=null)
         {
             List<Record> records = new List<Record>();
-            if (theme == "-")
+            if (userId == null)
+            {
                 records = DbContext.Records.ToList();
+            }
+            else records = DbContext.Records.Where(a => a.USerID == userId).ToList();
+            if (theme == "-")
+                records = records.ToList();
             else
-                records = DbContext.Records.Where(a => a.ThemeName == theme).ToList();
+                records =records.Where(a => a.ThemeName == theme).ToList();
             if (update)
             {
                 count = records.Count();
@@ -432,7 +437,7 @@ namespace Instructions.Controllers
                 record.ImageLink = null;
                 DbContext.Records.Update(record);
             }
-            DbContext.SaveChangesAsync().Wait();
+            DbContext.SaveChanges();
         }
         public void DeleteStepPhoto(int ID)
         {
