@@ -110,6 +110,19 @@
                 alert("@Localizer["Only one file here"]");
                 this.removeFile(file);
             }
-        });
+    });
+     myDropzone.on("removedfile", function (file, xhr, formData) {
+        $.ajax({
+            url: '/Records/RemoveFileFromRecord',
+            type: 'POST',
+            cache: false,
+            async: true,
+            dataType: "html"
+
+        })
+            .fail(function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+            })
+    });
 
 </script>

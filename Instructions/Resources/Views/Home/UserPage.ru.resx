@@ -126,6 +126,12 @@
   <data name="Create new record" xml:space="preserve">
     <value>Создать новую запись</value>
   </data>
+  <data name="First new" xml:space="preserve">
+    <value>Сначала новые</value>
+  </data>
+  <data name="Rated" xml:space="preserve">
+    <value>По рейтингу</value>
+  </data>
   <data name="Theme" xml:space="preserve">
     <value>Тема</value>
   </data>

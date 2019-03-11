@@ -61,12 +61,12 @@
 </script>
 <script type="text/javascript">
     $('.btn-outline-info').on('click', function (e) {
-        if ($(this).closest('#edit').val() == "Edit") {
+        if ($(this).closest('#edit').val() =="@Localizer["Edit"]") {
             $('.btn-info').hide();
             $(this).closest('.btn-info').show();
             var text = $(this).closest('.card-text').text();
             $(this).closest(".card ").append("<div id='changes'><p>Enter changes</p><input type='text' name='EditComment' id='EditComment' class='form-control' /></div>");
-            $(this).closest('#edit').val("Save");
+            $(this).closest('#edit').val("@Localizer["Save"]");
 
         }
         else {
@@ -80,7 +80,7 @@
             })
                 .done(function (result) {
                     $('#Comments').html(result);
-                    $('#edit').val("Edit");
+                    $('#edit').val("@Localizer["Edit"]");
                     $(this).closest("#EditComment").remove();
 
                 }).fail(function (xhr) {

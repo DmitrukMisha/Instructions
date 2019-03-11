@@ -18,7 +18,7 @@
             <div class="card-header"><a asp-controller="Home" asp-action="Record" asp-route-id="@item.RecordID"><eq-highlight-text text="@Model.Text" value="@item.Name" /></a></div>
             <div class="card-body">
                 <h4><a asp-controller="Home" asp-route-id="@item.USerID" asp-action="UserPage">@Localizer["Author"]:<eq-highlight-text text="@Model.Text" value=" @ViewData["author" + item.RecordID.ToString()]" /><span class="sr-only"></span></a></h4>
-                <h5 class="card-title">@Localizer["Theme"]:<eq-highlight-text text="@Model.Text" value="@item.ThemeName" /></h5>
+                <h5 class="card-title" style="color:#00bc8c">@Localizer["Theme"]:<eq-highlight-text text="@Model.Text" value="@item.ThemeName" /></h5>
                 <p class="card-text">@Localizer["Description"]:<eq-highlight-text text="@Model.Text" value=" @item.Description" /></p>
             </div>
         </div>
@@ -36,7 +36,7 @@
             <div class="card-header"><a asp-controller="Home" asp-action="Record" asp-route-id="@step.RecordID.RecordID"><eq-highlight-text text="@Model.Text" value="@step.RecordID.Name" /></a></div>
             <div class="card-body">
                 <h4><a asp-controller="Home" asp-route-id="@step.RecordID.USerID" asp-action="UserPage">@Localizer["Author"]:<eq-highlight-text text="@Model.Text" value=" @ViewData["author" + step.RecordID.RecordID.ToString()]" /><span class="sr-only"></span></a></h4>
-                <h5 class="card-title">@Localizer["Theme"]:<eq-highlight-text text="@Model.Text" value="@step.RecordID.ThemeName" /></h5>
+                <h5 class="card-title"  style="color:#00bc8c">@Localizer["Theme"]:<eq-highlight-text text="@Model.Text" value="@step.RecordID.ThemeName" /></h5>
                 <h5 class="card-title">@Localizer["Step name"]:<eq-highlight-text text="@Model.Text" value="@step.StepName" /></h5>
                 <p><eq-highlight-text text="@Model.Text" value=" @stepText" /></p>
             </div>
@@ -51,7 +51,7 @@
             <div class="card-header"><a asp-controller="Home" asp-action="Record" asp-route-id="@tag.Record.RecordID"><eq-highlight-text text="@Model.Text" value="@tag.Record.Name" /></a></div>
             <div class="card-body">
                 <h4><a asp-controller="Home" asp-route-id="@tag.Record.USerID" asp-action="UserPage">@Localizer["Author"]:<eq-highlight-text text="@Model.Text" value=" @ViewData["author" + tag.Record.RecordID.ToString()]" /><span class="sr-only"></span></a></h4>
-                <h5 class="card-title">@Localizer["Theme"]:<eq-highlight-text text="@Model.Text" value="@tag.Record.ThemeName" /></h5>
+                <h5 class="card-title"  style="color:#00bc8c">@Localizer["Theme"]:<eq-highlight-text text="@Model.Text" value="@tag.Record.ThemeName" /></h5>
                 <p class="card-text">@Localizer["Description"]:<eq-highlight-text text="@Model.Text" value=" @tag.Record.Description" /></p>
                 <p><font color='gray' size='2'><eq-highlight-text text="@Model.Text" value="@ViewData[tag.Record.RecordID.ToString()]" /></font></p>
             </div>

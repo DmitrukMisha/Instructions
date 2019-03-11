@@ -30,7 +30,6 @@
     </select>
     <h3> @Localizer["Filter"]:   </h3>
     <select id="Filter" name="Filter" class="form-control col-md-2">
-
         <option>@Localizer["First new"]</option>
         <option>@Localizer["Rated"]</option>
     </select>
@@ -44,7 +43,7 @@
 
     var theme = "-";
     $("#Filter").change(function () {
-        if ($("#Filter option:selected").val() == "New") {
+        if ($("#Filter option:selected").val() == "@Localizer["First new"]") {
             latest = true;
         }
         else {
