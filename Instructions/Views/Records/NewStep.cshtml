@@ -1,4 +1,7 @@
 ﻿@model Instructions.Models.Step
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
 @{
     if (Model == null)
     {
@@ -10,17 +13,19 @@
     {
         ViewData["Update"] = "true";
         ViewData["StepID"] = Model.StepID;
-        ViewData["MaxFiles"] = 3 - ViewBag.Images.Count();
+        ViewData["MaxFiles"] = 3 - ViewBag.Images.Count;
     }
 }
 <div class="myclass">
     <br />
-    <h4>Step</h4>
+    <h4>@Localizer["Step"]</h4>
     @if (ViewData["Update"].ToString() == "true")
     {
-        foreach (Image image in ViewBag.Images)
+        if (ViewBag.Images != null)
         {
-            <script type="text/javascript">
+            foreach (Image image in ViewBag.Images)
+            {
+                <script type="text/javascript">
             $.ajax({
              url: '/Records/Photo',
                 type: 'POST',
@@ -32,16 +37,16 @@
                 }).fail(function (xhr) {
                 console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
                 })
-            </script>
+                </script>
+            }
         }
         <div id="StepPhoto-@Model.StepID"></div>
     }
 
-
     <hr />
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="form-group">
-        <label asp-for="StepName" class="control-label">Step name</label>
+        <label asp-for="StepName" class="control-label">@Localizer["Step name"]</label>
         <input required asp-for="StepName" class="form-control" />
         <span asp-validation-for="StepName" class="text-danger"></span>
     </div>
@@ -57,7 +62,7 @@
 
         </div>
     </div>
-    <button type="button" class="btn btn-danger del-step" commid="@ViewData["id"]">Delete step</button>
+    <button type="button" class="btn btn-danger del-step" commid="@ViewData["id"]">@Localizer["Delete step"]</button>
 </div>
 <script type="text/javascript">
     $(".del-step").click(function () {
@@ -85,7 +90,7 @@
         url: "/Records/UploadFilesFromStep",
         maxFiles: @ViewData["MaxFiles"],
         maxfilesexceeded: function (file) {
-            alert("Max 3 files here");
+            alert("@Localizer["Max 3 files here"]");
             this.removeFile(file);
         }
     });
@@ -102,7 +107,6 @@
             .fail(function (xhr) {
                 console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
             })
-       // formData.append('userName', 'bob');
     });
     myDropzone.on("removedfile", function (file, xhr, formData) {
         $.ajax({
@@ -117,6 +121,5 @@
             .fail(function (xhr) {
                 console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
             })
-       // formData.append('userName', 'bob');
     });
 </script>

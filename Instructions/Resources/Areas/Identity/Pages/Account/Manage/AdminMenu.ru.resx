@@ -117,19 +117,49 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Dark theme" xml:space="preserve">
-    <value>Темная тема</value>
+  <data name="Admin" xml:space="preserve">
+    <value>Администратор</value>
   </data>
-  <data name="Home" xml:space="preserve">
-    <value>Главная</value>
+  <data name="Admin menu" xml:space="preserve">
+    <value>Меню администратора</value>
   </data>
-  <data name="Light theme" xml:space="preserve">
-    <value>Светлая тема</value>
+  <data name="Confirm your E-mail" xml:space="preserve">
+    <value>Подтвердите вашу почту</value>
   </data>
-  <data name="My page" xml:space="preserve">
-    <value>Моя страница</value>
+  <data name="Delete" xml:space="preserve">
+    <value>Удалить</value>
   </data>
-  <data name="Search" xml:space="preserve">
-    <value>Поиск</value>
+  <data name="Lock" xml:space="preserve">
+    <value>Заблокировать</value>
+  </data>
+  <data name="Locked" xml:space="preserve">
+    <value>Заблокирован</value>
+  </data>
+  <data name="Make|Unmake admin" xml:space="preserve">
+    <value>Сделать|Отменить администратором</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="Themes" xml:space="preserve">
+    <value>Темы</value>
+  </data>
+  <data name="Toggle All" xml:space="preserve">
+    <value>Выбрать все</value>
+  </data>
+  <data name="Unlock" xml:space="preserve">
+    <value>Разблокировать</value>
+  </data>
+  <data name="Unlocked" xml:space="preserve">
+    <value>Разблокирован</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>Пользователь</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Имя пользователя</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>Пользователи</value>
   </data>
 </root>

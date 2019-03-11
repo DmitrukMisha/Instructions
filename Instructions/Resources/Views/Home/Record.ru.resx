@@ -117,19 +117,40 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Dark theme" xml:space="preserve">
-    <value>Темная тема</value>
+  <data name="Comment" xml:space="preserve">
+    <value>Комментарий</value>
   </data>
-  <data name="Home" xml:space="preserve">
-    <value>Главная</value>
+  <data name="Confirm email to delete records" xml:space="preserve">
+    <value>Подтвердите почту чтобы удалять записи</value>
   </data>
-  <data name="Light theme" xml:space="preserve">
-    <value>Светлая тема</value>
+  <data name="Delete record" xml:space="preserve">
+    <value>Удалить запись</value>
   </data>
-  <data name="My page" xml:space="preserve">
-    <value>Моя страница</value>
+  <data name="Download PDF" xml:space="preserve">
+    <value>Скачать в PDF</value>
   </data>
-  <data name="Search" xml:space="preserve">
-    <value>Поиск</value>
+  <data name="Edit" xml:space="preserve">
+    <value>Изменить</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Следующий</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>Предыдущий</value>
+  </data>
+  <data name="Send" xml:space="preserve">
+    <value>Отправить</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>Пользователь</value>
+  </data>
+  <data name="You have rated it:" xml:space="preserve">
+    <value>Вы поставили оценку:</value>
+  </data>
+  <data name="You need log in or confirm email to leave comments" xml:space="preserve">
+    <value>Вам необходимо войти в систему или подтвердить электронную почту, чтобы оставить комментарий</value>
   </data>
 </root>

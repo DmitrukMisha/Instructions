@@ -60,7 +60,7 @@
                 @if (SignInManager.IsSignedIn(User))
                 {
                     <li class="nav-item">
-                        <a asp-area="" asp-controller="Home" asp-route-id="@user.Id" asp-action="UserPage" class="nav-link">My page<span class="sr-only"></span></a>
+                        <a asp-area="" asp-controller="Home" asp-route-id="@user.Id" asp-action="UserPage" class="nav-link">@Localizer["My page"]<span class="sr-only"></span></a>
                     </li>
                 }
             </ul>

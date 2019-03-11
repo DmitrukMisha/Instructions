@@ -1,44 +1,46 @@
 @{
     ViewData["Title"] = "Index";
 }
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 <br />
 
 <div class="jumbotron">
     @foreach (string tagName in ViewBag.TagsNames)
     {
-    <div style="background-color:azure; border-radius:15px;  padding:5px; padding-left:10px; padding-right:10px; display: inline-block;">
-        <a asp-controller="Search" asp-route-TextSearchInput="@tagName" asp-action="Index">@tagName</a>
-    </div>
+        <div style="background-color:azure; border-radius:15px;  padding:5px; padding-left:10px; padding-right:10px; display: inline-block;">
+            <a asp-controller="Search" asp-route-TextSearchInput="@tagName" asp-action="Index">@tagName</a>
+        </div>
     }
 
 </div>
 <div class="row justify-content-center">
-    <h3> Themes: </h3>
+    <h3> @Localizer["Themes"]: </h3>
     <select id="Themes" name="Themes" class="form-control col-md-3">
         <option>-</option>
         @foreach (string s in ViewBag.Themes)
         {
             <option>@s</option>
         }
-    </select> 
-    <h3> Filter:   </h3>
+    </select>
+    <h3> @Localizer["Filter"]:   </h3>
     <select id="Filter" name="Filter" class="form-control col-md-2">
 
-        <option>New</option>
-        <option>Rated</option>
-    </select>
+        <option>@Localizer["First new"]</option>
+        <option>@Localizer["Rated"]</option>
+</select>
 </div>
 <div id="Records"></div>
 <center>
-    <input type="button" id="AddMore" class="btn btn-default" value="Get more records" />
+    <input type="button" id="AddMore" class="btn btn-default" value="@Localizer["Get more records"]" />
 </center>
 <script type="text/javascript">
 
 </script>
 <script type="text/javascript">
     var latest = true, update = true;
-    var theme="-";
+    var theme = "-";
     $("#Filter").change(function () {
         if ($("#Filter option:selected").val() == "New") {
             latest = true;
