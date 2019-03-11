@@ -248,9 +248,9 @@ namespace Instructions.Controllers
                 recordfromdb.Description = record.Description;
                 recordfromdb.Name = record.Name;
                 recordfromdb.ThemeName = record.ThemeName;
-                if(recordfromdb.ImageLink == null)
-               recordfromdb.ImageLink = await CreateImageForRecord(record);
-               Recordcontext.Records.Update(recordfromdb);
+                if(recordfromdb.ImageLink == null&&MainFile!=null)
+                recordfromdb.ImageLink = await CreateImageForRecord(record);
+                Recordcontext.Records.Update(recordfromdb);
                 await Recordcontext.SaveChangesAsync();
                 await UpdateSteps(StepName, Text, recordfromdb);
                 await UpdateTags(recordfromdb, Tags);
@@ -263,11 +263,19 @@ namespace Instructions.Controllers
         
 
         [HttpPost]
-        public  void DelStepFromDB(int StepID)
+        public  async Task DelStepFromDB(int StepID)
         {
+           await DeleteStepPhotos(StepID);
             StepsIdForDelete.Add(StepID);
         }
-        
+        public async Task DeleteStepPhotos(int stepId)
+        {
+             var images= Recordcontext.Images.Where(a => a.StepID.StepID == stepId).ToList();
+            foreach (var image in images)
+                Recordcontext.Images.Remove(image);
+            await Recordcontext.SaveChangesAsync();
+
+        }
 
         public async Task UpdateSteps(List<string> StepName, List<string> Text, Record record)
         {
@@ -431,7 +439,7 @@ namespace Instructions.Controllers
                 {
                     CloudBlobContainer container = GetCloudBlobContainer("images");
                     var result = container.CreateIfNotExistsAsync().Result;
-                    CloudBlockBlob blob = container.GetBlockBlobReference(DateTime.Now.ToString().Replace(" ", String.Empty) + fileName);
+                    CloudBlockBlob blob = container.GetBlockBlobReference(DateTime.Now.ToString().Replace(" ", String.Empty).GetHashCode()+new Random().Next().GetHashCode()+ fileName);
                     await blob.UploadFromStreamAsync(fileStream);
                     return blob.Uri.ToString();
                 }

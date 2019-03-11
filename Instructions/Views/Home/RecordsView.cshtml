@@ -4,6 +4,7 @@
 @foreach (Record item in Model)
 {
 
+
 <div class="jumbotron">
     <p class="display-3" align="center"> <a asp-controller="Home" asp-action="Record" asp-route-id="@item.RecordID">@item.Name</a></p>
     <div class="row">
@@ -35,7 +36,6 @@
 
     <p><font color="gray" size="2">@ViewData[item.RecordID.ToString()] </font></p>
 </div>
-    
 }
 
 
