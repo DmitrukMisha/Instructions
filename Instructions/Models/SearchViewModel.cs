@@ -10,6 +10,7 @@ namespace Instructions.Models
         public IQueryable<Record> Records { get; set; }
         public IQueryable<Tag> Tags { get; set; }
         public IQueryable<Step> Steps { get; set; }
+        public IQueryable<Comment> Comments { get; set; }
         public string Text { get; set; }
         public bool Success { get; set; }
     }
