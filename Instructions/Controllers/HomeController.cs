@@ -64,7 +64,10 @@ namespace Instructions.Controllers
             {
                 records = DbContext.Records.ToList();
             }
-            else records = DbContext.Records.Where(a => a.USerID == userId).ToList();
+            else
+            {
+                records = DbContext.Records.Where(a => a.USerID == userId).ToList();
+            }
             if (theme == "-")
                 records = records.ToList();
             else

@@ -13,7 +13,7 @@
 @if (ViewData["EmailConfirm"].ToString() == "False")
 {
     <script language="JavaScript">
-        alert(@Localizer["Confirm your E-mail"]);
+        alert("@Localizer["Confirm your E-mail"]");
         location.href = "Index";
     </script>
 }

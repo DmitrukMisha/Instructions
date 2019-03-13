@@ -24,7 +24,7 @@
 </div>
 
 
-@if ((User.Identity.Name != null) && ((bool)ViewData["Role"] || User.Identity.Name == (string)ViewData["Name"]))
+@if (User.Identity.Name != null && (User.Identity.Name == ViewData["Author"].ToString() || (bool)ViewData["Role"]))
 {
     if ((bool)ViewData["EmailConfirmed"])
     {
@@ -116,7 +116,7 @@
             <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="sr-only">@Localizer["Previous"]</span>
-</a>
+            </a>
             <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                 <span class="sr-only">@Localizer["Next"]</span>

@@ -39,7 +39,13 @@ namespace Instructions.Controllers
                 model.Records = dbContext.Records.FullTextSearchQuery(model.Text);
                 model.Steps = dbContext.Steps.FullTextSearchQuery(model.Text);
                 model.Tags = dbContext.Tags.FullTextSearchQuery(model.Text);
-               
+                model.Comments = dbContext.Comments.FullTextSearchQuery(model.Text);
+                List<Record> recordsForComments = new List<Record>();
+                foreach(Comment comment in model.Comments)
+                {
+                    recordsForComments.Add(dbContext.Records.Where(a => a.RecordID == comment.RecordID).FirstOrDefault());
+                }
+                ViewBag.Records = recordsForComments;
                 if (model.Records==null & model.Tags==null & model.Steps==null) model.Success = false;
             }else
             {
